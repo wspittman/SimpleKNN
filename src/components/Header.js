@@ -9,16 +9,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Header(props) {
+/**
+ * The header bar
+ * 
+ * Props (all passed through to HeaderMenu):
+ * setData(data) => Do what you need to with a new data set
+ * knn => The ML5 KNN object
+ * 
+ * @param {*} props React props
+ */
+export default function Header(props) {
   const classes = useStyles();
 
   return (
     <AppBar position="static" className={classes.header}>
       <Toolbar>
-        <HeaderMenu 
-          setData={(e) => console.log(e)}
-          knn={props.knn}
-        />
+        <HeaderMenu {...props} />
         <Typography variant="h6" noWrap>
           Simple KNNClassifier
         </Typography>
@@ -26,5 +32,3 @@ function Header(props) {
     </AppBar>
   );
 }
-
-export default Header;

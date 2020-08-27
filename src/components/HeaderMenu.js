@@ -10,10 +10,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Props:
-// setData(data) => Do what you need to with a new data set
-// knn => The ML5 KNN object
-function HeaderMenu(props) {
+/**
+ * The menu attached to the header, contains file upload/download options
+ * 
+ * Props:
+ * setData(data) => Do what you need to with a new data set
+ * knn => The ML5 KNN object
+ * 
+ * @param {*} props React props
+ */
+export default function HeaderMenu(props) {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const uploadCSVRef = React.useRef(null);
   const uploadModelRef = React.useRef(null);
@@ -24,7 +30,7 @@ function HeaderMenu(props) {
 
   const onCSVUpload = () => {
     const reader = new FileReader();
-    reader.onload = (e) => props.setData(parseCSV(e.target.result));
+    reader.onload = (e) => props.setData(parseCSV(e.target.result).data);
     reader.readAsText(uploadCSVRef.current.files[0]);
   };
 
@@ -82,5 +88,3 @@ function HeaderMenu(props) {
     </div>
   );
 }
-
-export default HeaderMenu;
