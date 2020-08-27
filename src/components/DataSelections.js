@@ -1,27 +1,37 @@
 import React from 'react';
-import { Checkbox, Radio } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import { Checkbox, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 
-// So we don't actually need the full dataset to be passed in, just the first two rows
-// props
-// columns
-// exampleRow
-// onChange
+/**
+ * The area to select which parts of the data to use
+ * 
+ * Props:
+ * columns: An array of column names
+ * example: An array of values for an example row
+ * labelIndex: The index of the column currently used as the ML label
+ * selectedIndices: An array of truthy values to indicate indices selected for use as data in the classifier
+ * setLabelIndex: (index) => Update the label index
+ * setSelectedIndices: (indices) => Update the index selection
+ * 
+ * @param {*} props React props
+ */
 export default function DataSelections(props) {
-  if (!props.columns) return <div></div>
+  if (!props.columns) return (<div />)
 
   const labelRadios = [];
   const dataCheckboxes = [];
 
+  const onChange = (event) => {
+    if (event.target.type === 'radio') {
+      props.setLabelIndex(+event.target.value);
+    } else {
+      props.selectedIndices[+event.target.value] = event.target.checked;
+      props.setSelectedIndices(props.selectedIndices);
+    }
+  }
+
   for (let i = 0; i < props.columns.length; i++) {
-    labelRadios.push(<TableCell padding="checkbox" ><Radio /></TableCell>)
-    dataCheckboxes.push(<TableCell padding="checkbox" ><Checkbox /></TableCell>)
+    labelRadios.push(<TableCell padding="checkbox"><Radio key={`LabelRadio${i}`} value={i} checked={props.labelIndex === i} onChange={onChange}/></TableCell>)
+    dataCheckboxes.push(<TableCell padding="checkbox"><Checkbox key={`DataCheckbox${i}`} value={i} checked={props.selectedIndices[i]} onChange={onChange}/></TableCell>)
   }
 
   return (
@@ -29,17 +39,17 @@ export default function DataSelections(props) {
       <Table aria-label="data selection table">
         <TableHead>
           <TableRow>
-            <TableCell></TableCell>
-            {props.columns.map(column => (
-              <TableCell>{column}</TableCell>
+            <TableCell />
+            {props.columns.map((column, i) => (
+              <TableCell key={`columnHeader${i}`}>{column}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
           <TableRow>
             <TableCell component="th" scope="row">Example</TableCell>
-            {props.example.map(value => (
-              <TableCell>{value}</TableCell>
+            {props.example.map((value, i) => (
+              <TableCell key={`columnValue${i}`}>{value}</TableCell>
             ))}
           </TableRow>
 

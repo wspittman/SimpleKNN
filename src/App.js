@@ -9,6 +9,8 @@ class App extends React.Component {
     this.state = {
       knn: window.ml5.KNNClassifier(),
       data: [],
+      labelIndex: 0,
+      selectedIndices: [],
     };
   }
 
@@ -23,7 +25,10 @@ class App extends React.Component {
         <DataSelections 
           columns={this.state.data[0]}
           example={this.state.data[1]}
-          onChange={() => {}}
+          labelIndex={this.state.labelIndex}
+          selectedIndices={this.state.selectedIndices}
+          setLabelIndex={(index) => {this.setState({labelIndex: index})}}
+          setSelectedIndices={(indices) => {this.setState({selectedIndices: indices})}}
         />
         
       </div>

@@ -13,8 +13,8 @@ const useStyles = makeStyles((theme) => ({
  * The header bar
  * 
  * Props (all passed through to HeaderMenu):
- * setData(data) => Do what you need to with a new data set
- * knn => The ML5 KNN object
+ * setData: (data) => Do what you need to with a new data set
+ * knn: The ML5 KNN object
  * 
  * @param {*} props React props
  */

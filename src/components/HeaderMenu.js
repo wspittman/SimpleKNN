@@ -14,8 +14,8 @@ const useStyles = makeStyles((theme) => ({
  * The menu attached to the header, contains file upload/download options
  * 
  * Props:
- * setData(data) => Do what you need to with a new data set
- * knn => The ML5 KNN object
+ * setData: (data) => Do what you need to with a new data set
+ * knn: The ML5 KNN object
  * 
  * @param {*} props React props
  */
