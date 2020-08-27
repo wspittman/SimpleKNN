@@ -30,8 +30,8 @@ export default function DataSelections(props) {
   }
 
   for (let i = 0; i < props.columns.length; i++) {
-    labelRadios.push(<TableCell padding="checkbox"><Radio key={`LabelRadio${i}`} value={i} checked={props.labelIndex === i} onChange={onChange}/></TableCell>)
-    dataCheckboxes.push(<TableCell padding="checkbox"><Checkbox key={`DataCheckbox${i}`} value={i} checked={props.selectedIndices[i]} onChange={onChange}/></TableCell>)
+    labelRadios.push(<TableCell padding="checkbox" key={`LabelRadio${i}`}><Radio value={i} checked={props.labelIndex === i} onChange={onChange}/></TableCell>)
+    dataCheckboxes.push(<TableCell padding="checkbox" key={`DataCheckbox${i}`}><Checkbox value={i} onChange={onChange}/></TableCell>)
   }
 
   return (
