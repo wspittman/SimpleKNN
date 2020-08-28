@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import { Button } from '@material-ui/core';
+import RunSelections from './components/RunSelections';
 
 class App extends React.Component {
   constructor(props) {
@@ -53,6 +54,8 @@ class App extends React.Component {
           setLabelIndex={(index) => {this.setState({labelIndex: index})}}
           setSelectedIndices={(indices) => {this.setState({selectedIndices: indices})}}
         />
+
+        <RunSelections />
 
         <Button onClick={() => this.trainClassifier()}>Temp Test</Button>
         
