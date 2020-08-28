@@ -1,5 +1,12 @@
 import React from 'react';
 import { Checkbox, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  firstColumn: {
+    width: 50,
+  },
+}));
 
 /**
  * The area to select which parts of the data to use
@@ -15,6 +22,8 @@ import { Checkbox, Paper, Radio, Table, TableBody, TableCell, TableContainer, Ta
  * @param {*} props React props
  */
 export default function DataSelections(props) {
+  const classes = useStyles();
+
   if (!props.columns) return (<div />)
 
   const labelRadios = [];
@@ -36,10 +45,10 @@ export default function DataSelections(props) {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="data selection table">
+      <Table size="small" aria-label="data selection table">
         <TableHead>
           <TableRow>
-            <TableCell />
+            <TableCell className={classes.firstColumn} />
             {props.columns.map((column, i) => (
               <TableCell key={`columnHeader${i}`}>{column}</TableCell>
             ))}
@@ -54,12 +63,12 @@ export default function DataSelections(props) {
           </TableRow>
 
           <TableRow>
-            <TableCell component="th" scope="row">Use as Label</TableCell>
+            <TableCell component="th" scope="row">Classification</TableCell>
             {labelRadios}
           </TableRow>
             
           <TableRow>
-            <TableCell component="th" scope="row">Use as Data</TableCell>
+            <TableCell component="th" scope="row">Training Data</TableCell>
             {dataCheckboxes}
           </TableRow>
         </TableBody>
