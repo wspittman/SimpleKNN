@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function RunSelections(props) {
   const [selectedOption, setSelectedOption] = React.useState("Test");
+  const [k, setK] = React.useState(3);
+  const [testPercent, setTestPercent] = React.useState(70);
+  const [classifyValues, setClassifyValues] = React.useState([]);
   const classes = useStyles();
 
   const testDescription = () => {
@@ -41,7 +44,8 @@ export default function RunSelections(props) {
           variant="outlined"
           type="number"
           size="small"
-          defaultValue="70"
+          defaultValue={testPercent}
+          onChange={event => setTestPercent(event.target.value)}
           InputProps={{endAdornment: <InputAdornment position="end">%</InputAdornment>}}
         />
         of the data, then test classification on the remainder
@@ -57,21 +61,26 @@ export default function RunSelections(props) {
           className={classes.inlineText}
           variant="outlined"
           size="small"
+          defaultValue={classifyValues}
+          onChange={event => setClassifyValues(event.target.value)}
         />
       </span>
     )
   }
 
+  const submit = (option) => selectedOption === "Test" ? props.test(k, testPercent) : props.classify(k, classifyValues);
+
   return (
     <Typography className={classes.paddedLine}>
-      <SplitButton onClick={() => {}} onSelectionChange={setSelectedOption} options={["Test", "Classify"]} />
+      <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={["Test", "Classify"]} />
 
       <TextField
         className={classes.inlineNumber}
         variant="outlined"
         type="number"
         size="small"
-        defaultValue="3"
+        defaultValue={k}
+        onChange={event => setK(event.target.value)}
         InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
       />
 

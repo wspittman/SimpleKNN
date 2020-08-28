@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
-import { Button } from '@material-ui/core';
 import RunSelections from './components/RunSelections';
 
 class App extends React.Component {
@@ -16,26 +15,43 @@ class App extends React.Component {
     };
   }
 
-  trainClassifier() {
-    this.state.knn.clearAllLabels();
-
-    let dataIndices = [];
+  prepData() {
+    const dataIndices = [];
     this.state.selectedIndices.forEach((val, i) => { if (val) { dataIndices.push(i); } });
 
-    const trimData = this.state.data.slice(1).map(row => [row[this.state.labelIndex]].concat(dataIndices.map(i => +row[i])));
+    return this.state.data.slice(1).map(row => [row[this.state.labelIndex]].concat(dataIndices.map(i => +row[i])));
+  }
 
-    //temp slice
-    for (let row of trimData.slice(1)) {
+  //first column in each row is label, all others are active training data
+  train(data) {
+    for (let row of data) {
       if (row[0] != null) {
         this.state.knn.addExample(row.slice(1), row[0]);
       }
     }
-    
-    //temp
-    this.state.knn.classify(trimData[0].slice(1), 3, (error, result) => {
-      if (error) return console.error(error);
-      console.log(result);
-    });
+  }
+
+  test(k, percent) {
+    let data = this.prepData();
+
+    // Shuffle
+    for (let i = data.length - 1; i >= 0; i--) {
+      let r = Math.floor(Math.random() * (i + 1));
+      let temp = data[i];
+      data[i] = data[r];
+      data[r] = temp;
+    }
+
+    let trainingLength = Math.floor(data.length * (percent / 100));
+    this.train(data.slice(0, trainingLength));
+    console.log("trained");
+
+    for (let row of data.slice(trainingLength)) {
+      this.state.knn.classify(row.slice(1), k)
+                    .then(result => {
+                      console.log(`Predicted ${result.label}, actually ${row[0]}`);
+                    });
+    }
   }
 
   render() {
@@ -55,10 +71,10 @@ class App extends React.Component {
           setSelectedIndices={(indices) => {this.setState({selectedIndices: indices})}}
         />
 
-        <RunSelections />
-
-        <Button onClick={() => this.trainClassifier()}>Temp Test</Button>
-        
+        <RunSelections 
+          test={(k, percent) => this.test(k, percent)}
+          classify={(k, values) => {}}
+        />
       </div>
     );
   }
