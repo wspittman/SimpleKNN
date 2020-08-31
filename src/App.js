@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import RunSelections from './components/RunSelections';
+import ResultTable from './components/ResultTable';
 
 class App extends React.Component {
   constructor(props) {
@@ -12,6 +13,8 @@ class App extends React.Component {
       data: [],
       labelIndex: 0,
       selectedIndices: [],
+      resultColumns: [],
+      resultRows: [],
     };
   }
 
@@ -62,7 +65,12 @@ class App extends React.Component {
 
     this.state.knn.classify(values, k)
                   .then(result => {
-                      console.log(`Predicted ${result.label}`);
+                      let rows = Object.keys(result.confidencesByLabel).map(key => [key, result.confidencesByLabel[key]]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]);
+
+                      this.setState({
+                        resultColumns: ['Prediction', 'Confidence'],
+                        resultRows: rows,
+                      })
                     });
   }
 
@@ -86,6 +94,11 @@ class App extends React.Component {
         <RunSelections 
           test={(k, percent) => this.test(k, percent)}
           classify={(k, values) => this.classify(k, values)}
+        />
+
+        <ResultTable
+          columns={this.state.resultColumns}
+          rows={this.state.resultRows}
         />
       </div>
     );
