@@ -54,6 +54,18 @@ class App extends React.Component {
     }
   }
 
+  classify(k, values) {
+    let data = this.prepData();
+
+    this.train(data);
+    console.log("trained");
+
+    this.state.knn.classify(values, k)
+                  .then(result => {
+                      console.log(`Predicted ${result.label}`);
+                    });
+  }
+
   render() {
     return (
       <div className="App">
@@ -73,7 +85,7 @@ class App extends React.Component {
 
         <RunSelections 
           test={(k, percent) => this.test(k, percent)}
-          classify={(k, values) => {}}
+          classify={(k, values) => this.classify(k, values)}
         />
       </div>
     );

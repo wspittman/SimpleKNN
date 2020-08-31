@@ -62,7 +62,7 @@ export default function RunSelections(props) {
           variant="outlined"
           size="small"
           defaultValue={classifyValues}
-          onChange={event => setClassifyValues(event.target.value)}
+          onChange={event => setClassifyValues(event.target.value.split(',').map(x => +x))}
         />
       </span>
     )
