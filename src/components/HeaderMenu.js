@@ -3,6 +3,7 @@ import { IconButton, Menu, MenuItem } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import { readString as parseCSV } from 'react-papaparse';
+import { save, load } from '../Classifier';
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -15,7 +16,6 @@ const useStyles = makeStyles((theme) => ({
  * 
  * Props:
  * setData: (data) => Do what you need to with a new data set
- * knn: The ML5 KNN object
  * 
  * @param {*} props React props
  */
@@ -36,12 +36,12 @@ export default function HeaderMenu(props) {
 
   const onModelUpload = () => {
     const reader = new FileReader();
-    reader.onload = (e) => props.knn.load(JSON.parse(e.target.result));
+    reader.onload = (e) => load(JSON.parse(e.target.result));
     reader.readAsText(uploadModelRef.current.files[0]);
   }
 
   const onExport = () => {
-    props.knn.save();
+    save();
     menuClose();
   }
 
