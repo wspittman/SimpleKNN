@@ -1,21 +1,21 @@
 import React from 'react';
-import { InputAdornment, TextField, Typography } from '@material-ui/core';
+import { InputAdornment, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SplitButton from './SplitButton';
 
 const useStyles = makeStyles((theme) => ({
   paddedLine: {
-    paddingTop: "10px",
-    paddingBottom: "10px",
+    ...theme.typography.body1,
+    padding: theme.spacing(1),
   },
   inlineNumber: {
-    paddingLeft: "10px",
-    paddingRight: "10px",
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
     width: "100px",
   },
   inlineText: {
-    paddingLeft: "10px",
-    paddingRight: "10px",
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
   }
 }));
 
@@ -71,21 +71,22 @@ export default function RunSelections(props) {
   const submit = (option) => selectedOption === "Test" ? props.test(k, testPercent) : props.classify(k, classifyValues);
 
   return (
-    <Typography className={classes.paddedLine}>
-      <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={["Test", "Classify"]} />
+    <div className={classes.paddedLine}>
+      <span>
+        <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={["Test", "Classify"]} />
 
-      <TextField
-        className={classes.inlineNumber}
-        variant="outlined"
-        type="number"
-        size="small"
-        defaultValue={k}
-        onChange={event => setK(event.target.value)}
-        InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
-      />
+        <TextField
+          className={classes.inlineNumber}
+          variant="outlined"
+          type="number"
+          size="small"
+          defaultValue={k}
+          onChange={event => setK(event.target.value)}
+          InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
+        />
 
-      {selectedOption === "Test" ? testDescription() : classifyDescription()}
-      
-    </Typography>
+        {selectedOption === "Test" ? testDescription() : classifyDescription()}
+      </span>
+    </div>
   );
 }
