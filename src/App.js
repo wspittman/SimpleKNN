@@ -3,7 +3,7 @@ import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
-import { clear, classify, test } from './Classifier';
+import { clearClassifier, runClassifier, testClassifier } from './Classifier';
 
 class App extends React.Component {
   constructor(props) {
@@ -42,8 +42,13 @@ class App extends React.Component {
         />
 
         <RunSelections 
-          test={(k, percent) => test(this.prepData(), k, percent, result => {})}
-          classify={(k, values) => classify(this.prepData(), k, values, result => {
+          test={(k, percent) => testClassifier(this.prepData(), k, percent, result => {
+            this.setState({
+              resultColumns: result.columns,
+              resultRows: result.rows
+            });
+          })}
+          classify={(k, values) => runClassifier(this.prepData(), k, values, result => {
             this.setState({
               resultColumns: result.columns,
               resultRows: result.rows

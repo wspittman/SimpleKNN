@@ -1,60 +1,134 @@
 let knn = window.ml5.KNNClassifier();
 let isTrained = false;
 
+let predictCallCount = 0;
+let results = [];
 
-//first column in each row is label, all others are active training data
-const train = (data) => {
-  for (let row of data) {
-    if (row[0] != null) {
-      knn.addExample(row.slice(1), row[0]);
-    }
-  }
-}
+// Clear the result objects
+const clearResults = (expectedCount) => {
+  predictCallCount = expectedCount;
+  results = [];
+};
 
-export function test(data, k, percent, cb) {
-  // Shuffle
+// Perform an in-place shuffling of the data
+const shuffle = (data) => {
   for (let i = data.length - 1; i >= 0; i--) {
     let r = Math.floor(Math.random() * (i + 1));
     let temp = data[i];
     data[i] = data[r];
     data[r] = temp;
   }
+};
 
-  let trainingLength = Math.floor(data.length * (percent / 100));
-  train(data.slice(0, trainingLength));
-  console.log("trained");
+// Train the KNN with this data, format [[label, val1, val2, ...], ...]
+const train = (data) => {
+  for (let row of data) {
+    let label = row[0];
 
-  for (let row of data.slice(trainingLength)) {
-    knn.classify(row.slice(1), k)
-       .then(result => {
-          console.log(`Predicted ${result.label}, actually ${row[0]}`);
-
-       });
+    if (label != null) {
+      knn.addExample(row.slice(1), label);
+    }
   }
-}
 
-export function classify(data, k, values, cb) {
-  if (!isTrained) {
-    train(data);
-    console.log("trained");
-  }
-  
+  isTrained = true;
+  console.log("KNN Trained");
+};
+
+/**
+ * Make a prediction
+ * @param {Number} k The K for K-Nearest-Neighbors
+ * @param {Number[]} values The values to predict on
+ * @param {String} expected The expected result if testing, or null otherwise
+ * @param {Function} done Callback with (), called only by one predict function when all are complete
+ */
+const predict = (k, values, expected, done) => {
   knn.classify(values, k)
      .then(result => {
-        let rows = Object.keys(result.confidencesByLabel)
-                         .map(key => [key, result.confidencesByLabel[key]])
-                         .filter(x => x[1] > 0)
-                         .sort((a, b) => b[1] - a[1]);
-
-
-        cb({
-          columns: ['Prediction', 'Confidence'],
-          rows: rows,
+       results.push({
+         label: result.label,
+         confidences: result.confidencesByLabel,
+         expected: expected
         });
-      });
+
+       if (results.length === predictCallCount) {
+         done();
+       }
+     });
+};
+
+const createTestSummary = (done) => {
+  let summary = {};
+
+  for (let result of results) {
+    console.log(`Predicted ${result.label}, actually ${result.expected}`);
+
+    let { label, confidences, expected } = result;
+
+    summary[expected] = summary[expected] || {};
+    summary[expected][label] = summary[expected][label] || { count: 0, confidenceSum: 0 };
+
+    summary[expected][label].count++;
+    summary[expected][label].confidenceSum += confidences[label];
+  }
+
+  console.log(summary);
+
+  let rows = [];
+  
+  for (let expected of Object.keys(summary)) {
+    for (let label of Object.keys(summary[expected])) {
+      rows.push([
+        summary[expected][label].count,
+        expected,
+        label,
+        summary[expected][label].confidenceSum / summary[expected][label].count,
+      ]);
+    }
+  }
+
+  done({ 
+    columns: ['Count', 'Actual', 'Prediction', 'Average Confidence'],
+    rows: rows.sort((a, b) => b[0] - a[0]),
+  });
+};
+
+export function testClassifier(data, k, percent, done) {
+  shuffle(data);
+
+  let trainingLength = Math.floor(data.length * (percent / 100));
+  let trainingData = data.slice(0, trainingLength);
+  let testingData = data.slice(trainingLength);
+
+  train(trainingData);
+  clearResults(testingData.length);
+
+  for (let row of testingData) {
+    predict(k, row.slice(1), row[0], () => createTestSummary(done));
+  }
 }
 
-export function clear() {
+export function runClassifier(data, k, values, done) {
+  if (!isTrained) {
+    train(data);
+  }
+  
+  clearResults(1);
+
+  predict(k, values, null, () => {
+    let confidences = results[0].confidences;
+    let rows = Object.keys(confidences)
+                     .map(key => [key, confidences[key]])
+                     .filter(x => x[1] > 0)
+                     .sort((a, b) => b[1] - a[1]);
+
+    done({
+      columns: ['Prediction', 'Confidence'],
+      rows: rows,
+    });
+  });
+}
+
+export function clearClassifier() {
   knn.clearAllLabels();
   isTrained = false;
 }
