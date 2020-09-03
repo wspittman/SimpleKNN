@@ -5,36 +5,33 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
  * An table to display result data
  * 
  * Props:
- * title: A title line to display above the table
- * columns: An array of column names
- * rows: An array of arrays of values
+ * content: {title, columns, rows}
  * 
  * @param {*} props React props
  */
 export default function ResultTable(props) {
-  const [orderBy, setOrderBy] = React.useState(null);
-  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState(0);
+  const [order, setOrder] = React.useState('desc');
 
-  if (!props.columns) return (<div />)
+  if (!props.content) return (<div />)
 
-  const stableSort = (rows) => {
-    console.log('stablesort');
-    const stabilizedThis = rows.map((row, index) => [row, index]);
-    stabilizedThis.sort((a, b) => {
-      let compare = order === 'asc' ? a[0][orderBy] - b[0][orderBy] : b[0][orderBy] - a[0][orderBy];
-      if (compare !== 0) return compare;
-      return a[1] - b[1];
-    });
-    return stabilizedThis.map(el => el[0]);
-  }
+  let {title, columns, rows} = props.content;
+
+  let stableRows = rows.map((row, index) => [row, index]);
+  stableRows.sort((a, b) => {
+    let compare = order === 'asc' ? a[0][orderBy] - b[0][orderBy] : b[0][orderBy] - a[0][orderBy];
+    if (compare !== 0) return compare;
+    return a[1] - b[1];
+  });
+  let sortedRows = stableRows.map(el => el[0]);
 
   return (
     <TableContainer component={Paper}>
-      <Typography variant="h6">{props.title}</Typography>
+      <Typography variant="h6">{title}</Typography>
       <Table size="small" aria-label="result table">
         <TableHead>
           <TableRow>
-            {props.columns.map((column, i) => (
+            {columns.map((column, i) => (
               <TableCell 
                 key={`columnHeader${i}`}
                 sortDirection={orderBy === i ? order : false}
@@ -55,7 +52,7 @@ export default function ResultTable(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {stableSort(props.rows).map((row, i) => (
+          {sortedRows.map((row, i) => (
             <TableRow key={`resultRow${i}`}>
               {row.map((value, j) => (
                 <TableCell key={`resultValue${i}-${j}`}>{value}</TableCell>

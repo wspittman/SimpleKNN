@@ -15,12 +15,8 @@ class App extends React.Component {
       labelIndex: 0,
       selectedIndices: [],
 
-      resulteTitle: '',
-      resultColumns: [],
-      resultRows: [],
+      results: []
     };
-
-    this.setResultState = this.setResultState.bind(this);
   }
 
   prepData() {
@@ -34,14 +30,6 @@ class App extends React.Component {
                           .map(row => [row[this.state.labelIndex]]
                           // Then append all the data values, coerced back into numbers
                           .concat(dataIndices.map(i => +row[i])));
-  }
-
-  setResultState(result) {
-    this.setState({
-      resultTitle: result.title,
-      resultColumns: result.columns,
-      resultRows: result.rows
-    });
   }
 
   render() {
@@ -61,15 +49,16 @@ class App extends React.Component {
         />
 
         <RunSelections 
-          test={(k, percent) => testClassifier(this.prepData(), k, percent, this.setResultState)}
-          classify={(k, values) => runClassifier(this.prepData(), k, values, this.setResultState)}
+          test={(k, percent) => testClassifier(this.prepData(), k, percent, results => this.setState({results: results}))}
+          classify={(k, values) => runClassifier(this.prepData(), k, values, results => this.setState({results: results}))}
         />
 
-        <ResultTable
-          title={this.state.resultTitle}
-          columns={this.state.resultColumns}
-          rows={this.state.resultRows}
-        />
+        {this.state.results.map((result, i) => (
+          <ResultTable
+            key={`ResultTable${i}`}
+            content={result}
+          />
+        ))}
       </div>
     );
   }

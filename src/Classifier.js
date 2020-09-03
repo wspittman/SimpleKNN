@@ -58,11 +58,14 @@ const predict = (k, values, expected, done) => {
 
 const createTestSummary = (done) => {
   let summary = {};
+  let correctCount = 0;
 
   for (let result of results) {
     console.log(`Predicted ${result.label}, actually ${result.expected}`);
 
     let { label, confidences, expected } = result;
+
+    if (label === expected) correctCount++;
 
     summary[expected] = summary[expected] || {};
     summary[expected][label] = summary[expected][label] || { count: 0, confidenceSum: 0 };
@@ -70,8 +73,6 @@ const createTestSummary = (done) => {
     summary[expected][label].count++;
     summary[expected][label].confidenceSum += confidences[label];
   }
-
-  console.log(summary);
 
   let correctRows = [];
   let incorrectRows = [];
@@ -93,11 +94,18 @@ const createTestSummary = (done) => {
     }
   }
 
-  done({ 
-    title: `${correctRows.length / results.length * 100}% Correct Classification`,
-    columns: ['Count', 'Actual', 'Prediction', 'Average Confidence'],
-    rows: incorrectRows.sort((a, b) => b[0] - a[0]),
-  });
+  done([
+    { 
+      title: `${(correctCount / results.length * 100).toFixed(2)}% Correct Classification`,
+      columns: ['Count', 'Prediction', 'Average Confidence'],
+      rows: correctRows,
+    },
+    { 
+      title: `${((results.length - correctCount) / results.length * 100).toFixed(2)}% Incorrect Classification`,
+      columns: ['Count', 'Actual', 'Prediction', 'Average Confidence'],
+      rows: incorrectRows,
+    }
+  ]);
 };
 
 export function testClassifier(data, k, percent, done) {
@@ -129,11 +137,11 @@ export function runClassifier(data, k, values, done) {
                      .filter(x => x[1] > 0)
                      .sort((a, b) => b[1] - a[1]);
 
-    done({
+    done([{
       title: `Classify values [${values}] with K=${k}`,
       columns: ['Prediction', 'Confidence'],
       rows: rows,
-    });
+    }]);
   });
 }
 
