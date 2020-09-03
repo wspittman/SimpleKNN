@@ -11,18 +11,37 @@ class App extends React.Component {
 
     this.state = {
       data: [],
+
       labelIndex: 0,
       selectedIndices: [],
+
+      resulteTitle: '',
       resultColumns: [],
       resultRows: [],
     };
+
+    this.setResultState = this.setResultState.bind(this);
   }
 
   prepData() {
-    const dataIndices = [];
-    this.state.selectedIndices.forEach((val, i) => { if (val) { dataIndices.push(i); } });
+    // Translate the bool[] to a shorter int[]
+    const dataIndices = this.state.selectedIndices.map((val, i) => val ? i : null)
+                                                  .filter(x => x != null);
 
-    return this.state.data.slice(1).map(row => [row[this.state.labelIndex]].concat(dataIndices.map(i => +row[i])));
+    // Return the data in the format [[label, data1, ...], ...]
+    return this.state.data.slice(1)
+                          // For each row, create an array with the label
+                          .map(row => [row[this.state.labelIndex]]
+                          // Then append all the data values, coerced back into numbers
+                          .concat(dataIndices.map(i => +row[i])));
+  }
+
+  setResultState(result) {
+    this.setState({
+      resultTitle: result.title,
+      resultColumns: result.columns,
+      resultRows: result.rows
+    });
   }
 
   render() {
@@ -42,21 +61,12 @@ class App extends React.Component {
         />
 
         <RunSelections 
-          test={(k, percent) => testClassifier(this.prepData(), k, percent, result => {
-            this.setState({
-              resultColumns: result.columns,
-              resultRows: result.rows
-            });
-          })}
-          classify={(k, values) => runClassifier(this.prepData(), k, values, result => {
-            this.setState({
-              resultColumns: result.columns,
-              resultRows: result.rows
-            });
-          })}
+          test={(k, percent) => testClassifier(this.prepData(), k, percent, this.setResultState)}
+          classify={(k, values) => runClassifier(this.prepData(), k, values, this.setResultState)}
         />
 
         <ResultTable
+          title={this.state.resultTitle}
           columns={this.state.resultColumns}
           rows={this.state.resultRows}
         />

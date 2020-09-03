@@ -1,10 +1,11 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
 
 /**
  * An table to display result data
  * 
  * Props:
+ * title: A title line to display above the table
  * columns: An array of column names
  * rows: An array of arrays of values
  * 
@@ -15,6 +16,7 @@ export default function ResultTable(props) {
 
   return (
     <TableContainer component={Paper}>
+      <Typography variant="h6">{props.title}</Typography>
       <Table size="small" aria-label="result table">
         <TableHead>
           <TableRow>

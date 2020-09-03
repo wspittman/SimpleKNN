@@ -73,22 +73,30 @@ const createTestSummary = (done) => {
 
   console.log(summary);
 
-  let rows = [];
+  let correctRows = [];
+  let incorrectRows = [];
   
   for (let expected of Object.keys(summary)) {
     for (let label of Object.keys(summary[expected])) {
-      rows.push([
+      let row = [
         summary[expected][label].count,
         expected,
         label,
         summary[expected][label].confidenceSum / summary[expected][label].count,
-      ]);
+      ];
+
+      if (expected === label) {
+        correctRows.push(row.slice(0, 2).concat(row.slice(3)));
+      } else {
+        incorrectRows.push(row);
+      }
     }
   }
 
   done({ 
+    title: `${correctRows.length / results.length * 100}% Correct Classification`,
     columns: ['Count', 'Actual', 'Prediction', 'Average Confidence'],
-    rows: rows.sort((a, b) => b[0] - a[0]),
+    rows: incorrectRows.sort((a, b) => b[0] - a[0]),
   });
 };
 
@@ -122,6 +130,7 @@ export function runClassifier(data, k, values, done) {
                      .sort((a, b) => b[1] - a[1]);
 
     done({
+      title: `Classify values [${values}] with K=${k}`,
       columns: ['Prediction', 'Confidence'],
       rows: rows,
     });
