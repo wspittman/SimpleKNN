@@ -82,7 +82,7 @@ const createTestSummary = (done) => {
         summary[expected][label].count,
         expected,
         label,
-        summary[expected][label].confidenceSum / summary[expected][label].count,
+        (summary[expected][label].confidenceSum / summary[expected][label].count).toFixed(2),
       ];
 
       if (expected === label) {
@@ -125,7 +125,7 @@ export function runClassifier(data, k, values, done) {
   predict(k, values, null, () => {
     let confidences = results[0].confidences;
     let rows = Object.keys(confidences)
-                     .map(key => [key, confidences[key]])
+                     .map(key => [key, confidences[key].toFixed(2)])
                      .filter(x => x[1] > 0)
                      .sort((a, b) => b[1] - a[1]);
 

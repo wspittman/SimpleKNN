@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@material-ui/core';
 
 /**
  * An table to display result data
@@ -12,7 +12,21 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
  * @param {*} props React props
  */
 export default function ResultTable(props) {
+  const [orderBy, setOrderBy] = React.useState(null);
+  const [order, setOrder] = React.useState('asc');
+
   if (!props.columns) return (<div />)
+
+  const stableSort = (rows) => {
+    console.log('stablesort');
+    const stabilizedThis = rows.map((row, index) => [row, index]);
+    stabilizedThis.sort((a, b) => {
+      let compare = order === 'asc' ? a[0][orderBy] - b[0][orderBy] : b[0][orderBy] - a[0][orderBy];
+      if (compare !== 0) return compare;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map(el => el[0]);
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -21,12 +35,27 @@ export default function ResultTable(props) {
         <TableHead>
           <TableRow>
             {props.columns.map((column, i) => (
-              <TableCell key={`columnHeader${i}`}>{column}</TableCell>
+              <TableCell 
+                key={`columnHeader${i}`}
+                sortDirection={orderBy === i ? order : false}
+              >
+                <TableSortLabel
+                  active={orderBy === i}
+                  direction={orderBy === i ? order : 'asc'}
+                  onClick={() => {
+                    let isAsc = orderBy === i && order === 'asc';
+                    setOrder(isAsc ? 'desc' : 'asc');
+                    setOrderBy(i);
+                  }}
+                >
+                  {column}
+                </TableSortLabel>
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.rows.map((row, i) => (
+          {stableSort(props.rows).map((row, i) => (
             <TableRow key={`resultRow${i}`}>
               {row.map((value, j) => (
                 <TableCell key={`resultValue${i}-${j}`}>{value}</TableCell>
