@@ -30,7 +30,6 @@ const train = (data) => {
     }
   }
 
-  isTrained = true;
   console.log("KNN Trained");
 };
 
@@ -97,12 +96,12 @@ const createTestSummary = (done) => {
   done([
     { 
       title: `${(correctCount / results.length * 100).toFixed(2)}% Correct Classification`,
-      columns: ['Count', 'Prediction', 'Average Confidence'],
+      columns: ['Count', 'Predicted', 'Average Confidence'],
       rows: correctRows,
     },
     { 
       title: `${((results.length - correctCount) / results.length * 100).toFixed(2)}% Incorrect Classification`,
-      columns: ['Count', 'Actual', 'Prediction', 'Average Confidence'],
+      columns: ['Count', 'Actual', 'Predicted', 'Average Confidence'],
       rows: incorrectRows,
     }
   ]);
@@ -115,7 +114,10 @@ export function testClassifier(data, k, percent, done) {
   let trainingData = data.slice(0, trainingLength);
   let testingData = data.slice(trainingLength);
 
+  // Always retrain in test mode
   train(trainingData);
+  isTrained = false;
+
   clearResults(testingData.length);
 
   for (let row of testingData) {
@@ -126,6 +128,7 @@ export function testClassifier(data, k, percent, done) {
 export function runClassifier(data, k, values, done) {
   if (!isTrained) {
     train(data);
+    isTrained = true;
   }
   
   clearResults(1);
@@ -139,14 +142,14 @@ export function runClassifier(data, k, values, done) {
 
     done([{
       title: `Classify values [${values}] with K=${k}`,
-      columns: ['Prediction', 'Confidence'],
+      columns: ['Predicted', 'Confidence'],
       rows: rows,
     }]);
   });
 }
 
 export function clearClassifier() {
-  knn.clearAllLabels();
+  knn = window.ml5.KNNClassifier();
   isTrained = false;
 }
 

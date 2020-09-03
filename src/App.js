@@ -36,7 +36,10 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header 
-          setData={(data) => {this.setState({data: data})}}
+          setData={(data) => {
+            clearClassifier();
+            this.setState({data: data});
+          }}
         />
 
         <DataSelections 
@@ -44,8 +47,14 @@ class App extends React.Component {
           example={this.state.data[1]}
           labelIndex={this.state.labelIndex}
           selectedIndices={this.state.selectedIndices}
-          setLabelIndex={(index) => {this.setState({labelIndex: index})}}
-          setSelectedIndices={(indices) => {this.setState({selectedIndices: indices})}}
+          setLabelIndex={(index) => {
+            clearClassifier();
+            this.setState({labelIndex: index});
+          }}
+          setSelectedIndices={(indices) => {
+            clearClassifier();
+            this.setState({selectedIndices: indices});
+          }}
         />
 
         <RunSelections 
