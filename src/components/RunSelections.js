@@ -39,6 +39,10 @@ export default function RunSelections(props) {
   const options = props.trainingDataPresent ? ['Test', 'Classify'] : ['Classify'];
   const classifyMessageStart = props.trainingDataPresent ? 'Train on the full data set, then ' : 'Using the imported model, ';
 
+  if (!options.includes(selectedOption)) {
+    setSelectedOption(options[0]);
+  }
+
   const testDescription = () => {
     return (
       <span>
