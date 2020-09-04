@@ -107,7 +107,7 @@ const createTestSummary = (done) => {
   ]);
 };
 
-export function testClassifier(data, k, percent, done) {
+function test(data, k, percent, done) {
   shuffle(data);
 
   let trainingLength = Math.floor(data.length * (percent / 100));
@@ -125,7 +125,7 @@ export function testClassifier(data, k, percent, done) {
   }
 }
 
-export function runClassifier(data, k, values, done) {
+function run(data, k, values, done) {
   if (!isTrained) {
     train(data);
     isTrained = true;
@@ -148,15 +148,23 @@ export function runClassifier(data, k, values, done) {
   });
 }
 
-export function clearClassifier() {
+function clear() {
   knn = window.ml5.KNNClassifier();
   isTrained = false;
 }
 
-export function save() {
+function save() {
   knn.save();
 }
 
-export function load(jsonModel) {
+function load(jsonModel) {
   knn.load(jsonModel);
 }
+
+export default {
+  test: test,
+  run: run,
+  clear: clear,
+  save: save,
+  load: load,
+};

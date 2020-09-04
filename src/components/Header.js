@@ -13,8 +13,9 @@ const useStyles = makeStyles((theme) => ({
  * The header bar
  * 
  * Props (all passed through to HeaderMenu):
- * setData: (data) => Do what you need to with a new data set
- * knn: The ML5 KNN object
+ * setTrainingData: (data) => Handle the uploaded training data
+ * setModel: (model) => Handle the uploaded KNN model
+ * saveModel: () => Download the currently trained KNN model
  * 
  * @param {*} props React props
  */

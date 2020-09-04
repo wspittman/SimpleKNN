@@ -3,14 +3,16 @@ import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
-import { clearClassifier, runClassifier, testClassifier } from './Classifier';
+import Classifier from './Classifier';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      data: [],
+      knnType: null,
+
+      trainingData: [],
 
       labelIndex: 0,
       selectedIndices: [],
@@ -19,48 +21,83 @@ class App extends React.Component {
     };
   }
 
+  setModel(model) {
+    Classifier.clear();
+    Classifier.load(model);
+    this.setState({knnType: 'model'});
+  }
+
+  trainingDataUpdate(stateObject) {
+    Classifier.clear();
+    this.setState(stateObject);
+  }
+
   prepData() {
     // Translate the bool[] to a shorter int[]
     const dataIndices = this.state.selectedIndices.map((val, i) => val ? i : null)
                                                   .filter(x => x != null);
 
     // Return the data in the format [[label, data1, ...], ...]
-    return this.state.data.slice(1)
+    return this.state.trainingData.slice(1)
                           // For each row, create an array with the label
                           .map(row => [row[this.state.labelIndex]]
                           // Then append all the data values, coerced back into numbers
                           .concat(dataIndices.map(i => +row[i])));
   }
 
+  createDataSelectionArea() {
+    if (this.state.knnType === 'data') {
+      return (
+        <DataSelections 
+          columns={this.state.trainingData[0]}
+          example={this.state.trainingData[1]}
+          labelIndex={this.state.labelIndex}
+          selectedIndices={this.state.selectedIndices}
+          setLabelIndex={index => this.trainingDataUpdate({labelIndex: index})}
+          setSelectedIndices={indices => this.trainingDataUpdate({selectedIndices: indices})}
+        />
+      );
+    } else if (this.state.knnType === 'model') {
+      return (
+        <div>Model Message</div>
+      );
+    } else {
+      return (
+        <div>Empty Message</div>
+      );
+    }
+  }
+
+  createRunSelectionArea() {
+    if (this.state.knnType === 'data') {
+      return (
+        <RunSelections 
+          test={(k, percent) => Classifier.test(this.prepData(), k, percent, results => this.setState({results: results}))}
+          classify={(k, values) => Classifier.run(this.prepData(), k, values, results => this.setState({results: results}))}
+        />
+      );
+    } else if (this.state.knnType === 'model') {
+      return (
+        <div>Model Message</div>
+      );
+    } else {
+      return (
+        <div>Empty Message</div>
+      );
+    }
+  }
+
   render() {
     return (
       <div className="App">
         <Header 
-          setData={(data) => {
-            clearClassifier();
-            this.setState({data: data});
-          }}
+          setTrainingData={data => this.trainingDataUpdate({trainingData: data, knnType: 'data'})}
+          setModel={model => this.setModel(model)}
+          saveModel={() => Classifier.save()}
         />
 
-        <DataSelections 
-          columns={this.state.data[0]}
-          example={this.state.data[1]}
-          labelIndex={this.state.labelIndex}
-          selectedIndices={this.state.selectedIndices}
-          setLabelIndex={(index) => {
-            clearClassifier();
-            this.setState({labelIndex: index});
-          }}
-          setSelectedIndices={(indices) => {
-            clearClassifier();
-            this.setState({selectedIndices: indices});
-          }}
-        />
-
-        <RunSelections 
-          test={(k, percent) => testClassifier(this.prepData(), k, percent, results => this.setState({results: results}))}
-          classify={(k, values) => runClassifier(this.prepData(), k, values, results => this.setState({results: results}))}
-        />
+        {this.createDataSelectionArea()}
+        {this.createRunSelectionArea()}
 
         {this.state.results.map((result, i) => (
           <ResultTable

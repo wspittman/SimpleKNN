@@ -3,7 +3,6 @@ import { IconButton, Menu, MenuItem } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import { readString as parseCSV } from 'react-papaparse';
-import { save, load } from '../Classifier';
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -15,7 +14,9 @@ const useStyles = makeStyles((theme) => ({
  * The menu attached to the header, contains file upload/download options
  * 
  * Props:
- * setData: (data) => Do what you need to with a new data set
+ * setTrainingData: (data) => Handle the uploaded training data
+ * setModel: (model) => Handle the uploaded KNN model
+ * saveModel: () => Download the currently trained KNN model
  * 
  * @param {*} props React props
  */
@@ -30,18 +31,18 @@ export default function HeaderMenu(props) {
 
   const onCSVUpload = () => {
     const reader = new FileReader();
-    reader.onload = (e) => props.setData(parseCSV(e.target.result).data);
+    reader.onload = (e) => props.setTrainingData(parseCSV(e.target.result).data);
     reader.readAsText(uploadCSVRef.current.files[0]);
   };
 
   const onModelUpload = () => {
     const reader = new FileReader();
-    reader.onload = (e) => load(JSON.parse(e.target.result));
+    reader.onload = (e) => props.setModel(JSON.parse(e.target.result));
     reader.readAsText(uploadModelRef.current.files[0]);
   }
 
   const onExport = () => {
-    save();
+    props.saveModel();
     menuClose();
   }
 
