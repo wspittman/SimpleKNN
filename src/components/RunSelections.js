@@ -23,17 +23,21 @@ const useStyles = makeStyles((theme) => ({
  * The area to select what kind of run to do
  * 
  * Props:
+ * trainingDataPresent: True if training data is present, false if an imported model is being used
  * test: (k, percent) => Train on a random % of the data, then test by classifying the remainder of the data using K neighbors
  * classify: (k, values) => Train on all of the data, then classify the provided values
  * 
  * @param {*} props React props
  */
 export default function RunSelections(props) {
-  const [selectedOption, setSelectedOption] = React.useState("Test");
+  const [selectedOption, setSelectedOption] = React.useState(null);
   const [k, setK] = React.useState(3);
   const [testPercent, setTestPercent] = React.useState(70);
   const [classifyValues, setClassifyValues] = React.useState([]);
   const classes = useStyles();
+
+  const options = props.trainingDataPresent ? ['Test', 'Classify'] : ['Classify'];
+  const classifyMessageStart = props.trainingDataPresent ? 'Train on the full data set, then ' : 'Using the imported model, ';
 
   const testDescription = () => {
     return (
@@ -56,7 +60,9 @@ export default function RunSelections(props) {
   const classifyDescription = () => {
     return (
       <span>
-        Train on the full data set, then classify these comma-separated values:
+        {classifyMessageStart}
+        classify these comma-separated values:
+        
         <TextField
           className={classes.inlineText}
           variant="outlined"
@@ -68,12 +74,12 @@ export default function RunSelections(props) {
     )
   }
 
-  const submit = (option) => selectedOption === "Test" ? props.test(k, testPercent) : props.classify(k, classifyValues);
+  const submit = () => selectedOption === 'Test' ? props.test(k, testPercent) : props.classify(k, classifyValues);
 
   return (
     <div className={classes.paddedLine}>
       <span>
-        <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={["Test", "Classify"]} />
+        <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={options} />
 
         <TextField
           className={classes.inlineNumber}
@@ -85,7 +91,7 @@ export default function RunSelections(props) {
           InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
         />
 
-        {selectedOption === "Test" ? testDescription() : classifyDescription()}
+        {selectedOption === 'Test' ? testDescription() : classifyDescription()}
       </span>
     </div>
   );

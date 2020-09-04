@@ -23,9 +23,6 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function DataSelections(props) {
   const classes = useStyles();
-
-  if (!props.columns) return (<div />)
-
   const labelRadios = [];
   const dataCheckboxes = [];
 

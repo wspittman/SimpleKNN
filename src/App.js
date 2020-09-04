@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
+import IntroMessage from './components/IntroMessage';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
 import Classifier from './Classifier';
@@ -57,33 +58,24 @@ class App extends React.Component {
           setSelectedIndices={indices => this.trainingDataUpdate({selectedIndices: indices})}
         />
       );
-    } else if (this.state.knnType === 'model') {
-      return (
-        <div>Model Message</div>
-      );
     } else {
       return (
-        <div>Empty Message</div>
+        <IntroMessage content={this.state.knnType === 'model' ? 'A model has been loaded' : null} />
       );
     }
   }
 
   createRunSelectionArea() {
-    if (this.state.knnType === 'data') {
+    if (this.state.knnType) {
       return (
         <RunSelections 
+          trainingDataPresent={this.state.knnType === 'data'}
           test={(k, percent) => Classifier.test(this.prepData(), k, percent, results => this.setState({results: results}))}
           classify={(k, values) => Classifier.run(this.prepData(), k, values, results => this.setState({results: results}))}
         />
       );
-    } else if (this.state.knnType === 'model') {
-      return (
-        <div>Model Message</div>
-      );
     } else {
-      return (
-        <div>Empty Message</div>
-      );
+      return (<div />);
     }
   }
 
