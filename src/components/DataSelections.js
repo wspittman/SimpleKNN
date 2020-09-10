@@ -16,8 +16,7 @@ const useStyles = makeStyles((theme) => ({
  * example: An array of values for an example row
  * labelIndex: The index of the column currently used as the ML label
  * selectedIndices: An array of truthy values to indicate indices selected for use as data in the classifier
- * setLabelIndex: (index) => Update the label index
- * setSelectedIndices: (indices) => Update the index selection
+ * setIndices: (labelIndex, selectedIndices) => Update the label index and index selection
  * 
  * @param {*} props React props
  */
@@ -27,20 +26,27 @@ export default function DataSelections(props) {
   const dataCheckboxes = [];
 
   let { columns, example, labelIndex, selectedIndices } = props;
-  let { setLabelIndex, setSelectedIndices } = props;
+  let { setIndices } = props;
 
   const onChange = (event) => {
-    if (event.target.type === 'radio') {
-      setLabelIndex(+event.target.value);
+    let newIndex = +event.target.value;
+    let isChecked = event.target.checked;
+    let isLabel = event.target.type === 'radio';
+
+    if (isLabel) {
+      labelIndex = newIndex;
+      selectedIndices[newIndex] = false;
     } else {
-      selectedIndices[+event.target.value] = event.target.checked;
-      setSelectedIndices(selectedIndices);
+      labelIndex = (isChecked && newIndex === labelIndex) ? null : labelIndex;
+      selectedIndices[newIndex] = isChecked;
     }
+
+    setIndices(labelIndex, selectedIndices);
   }
 
   for (let i = 0; i < columns.length; i++) {
     labelRadios.push(<TableCell padding="checkbox" key={`LabelRadio${i}`}><Radio value={i} checked={labelIndex === i} onChange={onChange}/></TableCell>)
-    dataCheckboxes.push(<TableCell padding="checkbox" key={`DataCheckbox${i}`}><Checkbox value={i} onChange={onChange}/></TableCell>)
+    dataCheckboxes.push(<TableCell padding="checkbox" key={`DataCheckbox${i}`}><Checkbox value={i} checked={!!selectedIndices[i]} onChange={onChange}/></TableCell>)
   }
 
   return (

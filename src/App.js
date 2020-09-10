@@ -24,6 +24,9 @@ class App extends React.Component {
       errorMessage: null,
       displayError: false,
     };
+
+    this.setModel = this.setModel.bind(this);
+    this.setTrainingData = this.setTrainingData.bind(this);
   }
 
   setError(message) {
@@ -84,6 +87,7 @@ class App extends React.Component {
           example={this.state.trainingData[1]}
           labelIndex={this.state.labelIndex}
           selectedIndices={this.state.selectedIndices}
+          setIndices={(labelIndex, selectedIndices) => this.trainingDataUpdate({labelIndex: labelIndex, selectedIndices: selectedIndices})}
           setLabelIndex={index => this.trainingDataUpdate({labelIndex: index})}
           setSelectedIndices={indices => this.trainingDataUpdate({selectedIndices: indices})}
         />
@@ -111,8 +115,8 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header 
-          setTrainingData={data => this.setTrainingData(data)}
-          setModel={model => this.setModel(model)}
+          setTrainingData={this.setTrainingData}
+          setModel={this.setModel}
           saveModel={() => Classifier.save()}
         />
 
