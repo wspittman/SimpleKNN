@@ -157,8 +157,10 @@ function save() {
   knn.save();
 }
 
-function load(jsonModel) {
-  knn.load(jsonModel);
+function load(jsonModel, done) {
+  knn.load(jsonModel)
+     .then(done)
+     .catch(done);
 }
 
 export default {

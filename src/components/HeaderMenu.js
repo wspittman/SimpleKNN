@@ -29,17 +29,21 @@ export default function HeaderMenu(props) {
   const menuClick = (event) => setMenuAnchor(event.currentTarget);
   const menuClose = () => setMenuAnchor(null);
 
-  const onCSVUpload = () => {
-    const reader = new FileReader();
-    reader.onload = (e) => props.setTrainingData(parseCSV(e.target.result).data);
-    reader.readAsText(uploadCSVRef.current.files[0]);
-  };
-
-  const onModelUpload = () => {
-    const reader = new FileReader();
-    reader.onload = (e) => props.setModel(JSON.parse(e.target.result));
-    reader.readAsText(uploadModelRef.current.files[0]);
+  const upload = (ref, onLoad) => {
+    if (ref.current.files) {
+      const reader = new FileReader();
+      reader.onload = (e) => onLoad(e.target.result);
+      reader.readAsText(ref.current.files[0]);
+    }
   }
+
+  const onCSVUpload = () => upload(uploadCSVRef, text => props.setTrainingData(parseCSV(text).data));
+  const onModelUpload = () => upload(uploadModelRef, text => {
+    let parsed = null;
+    try { parsed = JSON.parse(text) }
+    catch (e) {}
+    props.setModel(parsed);
+  });
 
   const onExport = () => {
     props.saveModel();

@@ -26,17 +26,20 @@ export default function DataSelections(props) {
   const labelRadios = [];
   const dataCheckboxes = [];
 
+  let { columns, example, labelIndex, selectedIndices } = props;
+  let { setLabelIndex, setSelectedIndices } = props;
+
   const onChange = (event) => {
     if (event.target.type === 'radio') {
-      props.setLabelIndex(+event.target.value);
+      setLabelIndex(+event.target.value);
     } else {
-      props.selectedIndices[+event.target.value] = event.target.checked;
-      props.setSelectedIndices(props.selectedIndices);
+      selectedIndices[+event.target.value] = event.target.checked;
+      setSelectedIndices(selectedIndices);
     }
   }
 
-  for (let i = 0; i < props.columns.length; i++) {
-    labelRadios.push(<TableCell padding="checkbox" key={`LabelRadio${i}`}><Radio value={i} checked={props.labelIndex === i} onChange={onChange}/></TableCell>)
+  for (let i = 0; i < columns.length; i++) {
+    labelRadios.push(<TableCell padding="checkbox" key={`LabelRadio${i}`}><Radio value={i} checked={labelIndex === i} onChange={onChange}/></TableCell>)
     dataCheckboxes.push(<TableCell padding="checkbox" key={`DataCheckbox${i}`}><Checkbox value={i} onChange={onChange}/></TableCell>)
   }
 
@@ -46,7 +49,7 @@ export default function DataSelections(props) {
         <TableHead>
           <TableRow>
             <TableCell className={classes.firstColumn} />
-            {props.columns.map((column, i) => (
+            {columns.map((column, i) => (
               
                 <TableCell key={`columnHeader${i}`}>{column}</TableCell>
               
@@ -58,7 +61,7 @@ export default function DataSelections(props) {
             <Tooltip title="An example row from the data">
               <TableCell component="th" scope="row">Example</TableCell>
             </Tooltip>
-            {props.example.map((value, i) => (
+            {example.map((value, i) => (
               <TableCell key={`columnValue${i}`}>{value}</TableCell>
             ))}
           </TableRow>

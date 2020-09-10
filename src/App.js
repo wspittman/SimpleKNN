@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
+import ErrorMessage from './components/ErrorMessage';
 import IntroMessage from './components/IntroMessage';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
@@ -18,14 +19,43 @@ class App extends React.Component {
       labelIndex: 0,
       selectedIndices: [],
 
-      results: []
+      results: [],
+
+      errorMessage: null,
+      displayError: false,
     };
   }
 
+  setError(message) {
+    this.setState({
+      errorMessage: message,
+      displayError: true,
+    });
+  }
+
   setModel(model) {
+    if (!model) {
+      this.setError('Could not parse model. Are you sure it is in JSON format?');
+      return;
+    }
+
     Classifier.clear();
-    Classifier.load(model);
-    this.setState({knnType: 'model'});
+
+    Classifier.load(model, error => {
+      if (error) this.setError('Could not parse model. Are you sure it was created by ML5 KNN?');
+      else this.setState({knnType: 'model'});
+    });
+  }
+
+  setTrainingData(data) {
+    if (!data ||
+        !Array.isArray(data[0]) || 
+        !Array.isArray(data[1])) {
+      this.setError('Could not parse training data. Are you sure it is a CSV with a header row?');
+      return;
+    }
+
+    this.trainingDataUpdate({trainingData: data, knnType: 'data'});
   }
 
   trainingDataUpdate(stateObject) {
@@ -58,11 +88,9 @@ class App extends React.Component {
           setSelectedIndices={indices => this.trainingDataUpdate({selectedIndices: indices})}
         />
       );
-    } else {
-      return (
-        <IntroMessage content={this.state.knnType === 'model' ? 'A model has been loaded' : null} />
-      );
     }
+
+    return <IntroMessage content={this.state.knnType === 'model' ? 'A model has been loaded' : null} />;
   }
 
   createRunSelectionArea() {
@@ -83,7 +111,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header 
-          setTrainingData={data => this.trainingDataUpdate({trainingData: data, knnType: 'data'})}
+          setTrainingData={data => this.setTrainingData(data)}
           setModel={model => this.setModel(model)}
           saveModel={() => Classifier.save()}
         />
@@ -97,6 +125,12 @@ class App extends React.Component {
             content={result}
           />
         ))}
+
+        <ErrorMessage 
+          message={this.state.errorMessage}
+          isVisible={this.state.displayError}
+          close={() => this.setState({displayError: false})}
+        />
       </div>
     );
   }
