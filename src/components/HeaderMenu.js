@@ -68,7 +68,7 @@ export default function HeaderMenu(props) {
         />
 
         <label htmlFor="upload-csv-button">
-          <MenuItem onClick={menuClose}>Upload CSV</MenuItem>
+          <MenuItem onClick={menuClose}>Upload CSV (Training Data)</MenuItem>
         </label>
 
         <input

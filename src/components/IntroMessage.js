@@ -29,7 +29,7 @@ export default function Message(props) {
   return (
     <div className={classes.paddedLine}>
       <Typography className={classes.paddedLine}>
-        {'Simple KNNClassifier is a no-code tool allowing those without a machine learning background to experiment using their existing CSV data and the '}
+        {'Simple KNNClassifier is a tool allowing those without a machine learning background to experiment using their existing CSV data and the '}
         <Link href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">K-Nearest Neighbors</Link>
         {' (KNN) machine learning algorithm'}
       </Typography>

@@ -1,5 +1,12 @@
 import React from 'react';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  paddedLine: {
+    padding: theme.spacing(1),
+  },
+}));
 
 /**
  * An table to display result data
@@ -12,6 +19,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 export default function ResultTable(props) {
   const [orderBy, setOrderBy] = React.useState(0);
   const [order, setOrder] = React.useState('desc');
+  const classes = useStyles();
 
   if (!props.content) return (<div />)
 
@@ -27,7 +35,7 @@ export default function ResultTable(props) {
 
   return (
     <TableContainer component={Paper}>
-      <Typography variant="h6">{title}</Typography>
+      <Typography className={classes.paddedLine} variant="h6">{title}</Typography>
       <Table size="small" aria-label="result table">
         <TableHead>
           <TableRow>

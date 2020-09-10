@@ -95,12 +95,12 @@ const createTestSummary = (done) => {
 
   done([
     { 
-      title: `${(correctCount / results.length * 100).toFixed(2)}% Correct Classification`,
+      title: `${(correctCount / results.length * 100).toFixed(2)}% Predicted Correctly`,
       columns: ['Count', 'Predicted', 'Average Confidence'],
       rows: correctRows,
     },
     { 
-      title: `${((results.length - correctCount) / results.length * 100).toFixed(2)}% Incorrect Classification`,
+      title: `${((results.length - correctCount) / results.length * 100).toFixed(2)}% Predicted Incorrectly`,
       columns: ['Count', 'Actual', 'Predicted', 'Average Confidence'],
       rows: incorrectRows,
     }

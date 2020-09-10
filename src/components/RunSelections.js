@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputAdornment, TextField } from '@material-ui/core';
+import { InputAdornment, TextField, Tooltip } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SplitButton from './SplitButton';
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
  * The area to select what kind of run to do
  * 
  * Props:
- * trainingDataPresent: True if training data is present, false if an imported model is being used
+ * trainingDataLength: The length of the training data, or null if an imported model is being used
  * test: (k, percent) => Train on a random % of the data, then test by classifying the remainder of the data using K neighbors
  * classify: (k, values) => Train on all of the data, then classify the provided values
  * 
@@ -31,17 +31,25 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function RunSelections(props) {
   const [selectedOption, setSelectedOption] = React.useState(null);
-  const [k, setK] = React.useState(3);
+  const [k, setK] = React.useState(null);
   const [testPercent, setTestPercent] = React.useState(70);
   const [classifyValues, setClassifyValues] = React.useState([]);
   const classes = useStyles();
 
-  const options = props.trainingDataPresent ? ['Test', 'Classify'] : ['Classify'];
-  const classifyMessageStart = props.trainingDataPresent ? 'Train on the full data set, then ' : 'Using the imported model, ';
+  const options = props.trainingDataLength ? ['Test', 'Classify'] : ['Classify'];
+  const classifyMessageStart = props.trainingDataLength ? 'Train on the full data set, then ' : 'Using the imported model, ';
 
   if (!options.includes(selectedOption)) {
     setSelectedOption(options[0]);
   }
+
+  if (props.trainingDataLength && !k) {
+    // A good starting number based on the available testing data
+    let defaultK = Math.floor(Math.sqrt(props.trainingDataLength * 0.7));
+    // Keep the number odd to decrease the chance of ties
+    defaultK = defaultK % 2 ? defaultK : defaultK - 1;
+    setK(defaultK);
+  } 
 
   const testDescription = () => {
     return (
@@ -85,15 +93,17 @@ export default function RunSelections(props) {
       <span>
         <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={options} />
 
-        <TextField
-          className={classes.inlineNumber}
-          variant="outlined"
-          type="number"
-          size="small"
-          defaultValue={k}
-          onChange={event => setK(event.target.value)}
-          InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
-        />
+        <Tooltip title="The number of neighbors to examine when predicting. Larger numbers has less noise, but higher computation times and increased bias from outliers.">
+          <TextField
+            className={classes.inlineNumber}
+            variant="outlined"
+            type="number"
+            size="small"
+            defaultValue={k}
+            onChange={event => setK(event.target.value)}
+            InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
+          />
+        </Tooltip>
 
         {selectedOption === 'Test' ? testDescription() : classifyDescription()}
       </span>
