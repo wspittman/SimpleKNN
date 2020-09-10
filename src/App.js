@@ -103,7 +103,7 @@ class App extends React.Component {
         <RunSelections 
           trainingDataLength={this.state.knnType === 'data' && this.state.trainingData.length}
           test={(k, percent) => Classifier.test(this.prepData(), k, percent, results => this.setState({results: results}))}
-          classify={(k, values) => Classifier.run(this.prepData(), k, values, results => this.setState({results: results}))}
+          predict={(k, values) => Classifier.run(this.prepData(), k, values, results => this.setState({results: results}))}
         />
       );
     } else {

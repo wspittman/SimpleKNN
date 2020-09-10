@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
  * 
  * Props:
  * trainingDataLength: The length of the training data, or null if an imported model is being used
- * test: (k, percent) => Train on a random % of the data, then test by classifying the remainder of the data using K neighbors
- * classify: (k, values) => Train on all of the data, then classify the provided values
+ * test: (k, percent) => Train on a random % of the data, then test by predicting the remainder of the data using K neighbors
+ * predict: (k, values) => Train on all of the data, then predict for the provided values
  * 
  * @param {*} props React props
  */
@@ -33,11 +33,11 @@ export default function RunSelections(props) {
   const [selectedOption, setSelectedOption] = React.useState(null);
   const [k, setK] = React.useState(null);
   const [testPercent, setTestPercent] = React.useState(70);
-  const [classifyValues, setClassifyValues] = React.useState([]);
+  const [predictValues, setPredictValues] = React.useState([]);
   const classes = useStyles();
 
-  const options = props.trainingDataLength ? ['Test', 'Classify'] : ['Classify'];
-  const classifyMessageStart = props.trainingDataLength ? 'Train on the full data set, then ' : 'Using the imported model, ';
+  const options = props.trainingDataLength ? ['Test', 'Predict'] : ['Predict'];
+  const predictMessageStart = props.trainingDataLength ? 'Train on the full data set, then ' : 'Using the imported model, ';
 
   if (!options.includes(selectedOption)) {
     setSelectedOption(options[0]);
@@ -64,29 +64,29 @@ export default function RunSelections(props) {
           onChange={event => setTestPercent(event.target.value)}
           InputProps={{endAdornment: <InputAdornment position="end">%</InputAdornment>}}
         />
-        of the data, then test classification on the remainder
+        of the data, then test prediction on the remainder
       </span>
     )
   };
 
-  const classifyDescription = () => {
+  const predictDescription = () => {
     return (
       <span>
-        {classifyMessageStart}
-        classify these comma-separated values:
+        {predictMessageStart}
+        predict for these comma-separated values:
         
         <TextField
           className={classes.inlineText}
           variant="outlined"
           size="small"
-          defaultValue={classifyValues}
-          onChange={event => setClassifyValues(event.target.value.split(',').map(x => +x))}
+          defaultValue={predictValues}
+          onChange={event => setPredictValues(event.target.value.split(',').map(x => +x))}
         />
       </span>
     )
   }
 
-  const submit = () => selectedOption === 'Test' ? props.test(k, testPercent) : props.classify(k, classifyValues);
+  const submit = () => selectedOption === 'Test' ? props.test(k, testPercent) : props.predict(k, predictValues);
 
   return (
     <div className={classes.paddedLine}>
@@ -105,7 +105,7 @@ export default function RunSelections(props) {
           />
         </Tooltip>
 
-        {selectedOption === 'Test' ? testDescription() : classifyDescription()}
+        {selectedOption === 'Test' ? testDescription() : predictDescription()}
       </span>
     </div>
   );

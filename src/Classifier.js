@@ -141,7 +141,7 @@ function run(data, k, values, done) {
                      .sort((a, b) => b[1] - a[1]);
 
     done([{
-      title: `Classify values [${values}] with K=${k}`,
+      title: `Predict for values [${values}] with K=${k}`,
       columns: ['Predicted', 'Confidence'],
       rows: rows,
     }]);
