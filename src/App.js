@@ -16,7 +16,7 @@ class App extends React.Component {
 
       trainingData: [],
 
-      labelIndex: 0,
+      labelIndex: null,
       selectedIndices: [],
 
       results: [],
@@ -58,7 +58,12 @@ class App extends React.Component {
       return;
     }
 
-    this.trainingDataUpdate({trainingData: data, knnType: 'data'});
+    this.trainingDataUpdate({
+      trainingData: data,
+      knnType: 'data',
+      labelIndex: null,
+      selectedIndices: []
+    });
   }
 
   trainingDataUpdate(stateObject) {
@@ -88,8 +93,6 @@ class App extends React.Component {
           labelIndex={this.state.labelIndex}
           selectedIndices={this.state.selectedIndices}
           setIndices={(labelIndex, selectedIndices) => this.trainingDataUpdate({labelIndex: labelIndex, selectedIndices: selectedIndices})}
-          setLabelIndex={index => this.trainingDataUpdate({labelIndex: index})}
-          setSelectedIndices={indices => this.trainingDataUpdate({selectedIndices: indices})}
         />
       );
     }
