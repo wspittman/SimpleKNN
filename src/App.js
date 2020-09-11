@@ -3,6 +3,7 @@ import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import ErrorMessage from './components/ErrorMessage';
 import IntroMessage from './components/IntroMessage';
+import ProgressCircle from './components/ProgressCircle';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
 import Classifier from './Classifier';
@@ -21,18 +22,37 @@ class App extends React.Component {
 
       results: [],
 
+      progressValue: 0,
+      progressLabel: null,
+
       errorMessage: null,
       displayError: false,
     };
 
+    this.setProgress = this.setProgress.bind(this);
     this.setModel = this.setModel.bind(this);
     this.setTrainingData = this.setTrainingData.bind(this);
+    this.setResults = this.setResults.bind(this);
   }
 
   setError(message) {
     this.setState({
       errorMessage: message,
       displayError: true,
+    });
+  }
+
+  setProgress(stage, value) {
+    this.setState({
+      progressLabel: stage,
+      progressValue: value
+    });
+  }
+  
+  setResults(results) {
+    this.setState({
+      progressLabel: null,
+      results: results
     });
   }
 
@@ -65,7 +85,7 @@ class App extends React.Component {
       selectedIndices: []
     });
   }
-
+  
   trainingDataUpdate(stateObject) {
     Classifier.clear();
     this.setState(stateObject);
@@ -105,10 +125,18 @@ class App extends React.Component {
       return (
         <RunSelections 
           trainingDataLength={this.state.knnType === 'data' && this.state.trainingData.length}
-          test={(k, percent) => Classifier.test(this.prepData(), k, percent, results => this.setState({results: results}))}
-          predict={(k, values) => Classifier.run(this.prepData(), k, values, results => this.setState({results: results}))}
+          test={(k, percent) => Classifier.test(this.prepData(), k, percent, this.setProgress, this.setResults)}
+          predict={(k, values) => Classifier.run(this.prepData(), k, values, this.setProgress, this.setResults)}
         />
       );
+    } else {
+      return (<div />);
+    }
+  }
+
+  createProgressCircle() {
+    if (this.state.progressLabel) {
+      return <ProgressCircle value={this.state.progressValue} label={this.state.progressLabel}/>
     } else {
       return (<div />);
     }
@@ -125,6 +153,7 @@ class App extends React.Component {
 
         {this.createDataSelectionArea()}
         {this.createRunSelectionArea()}
+        {this.createProgressCircle()}
 
         {this.state.results.map((result, i) => (
           <ResultTable

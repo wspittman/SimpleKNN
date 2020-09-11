@@ -1,14 +1,6 @@
 let knn = window.ml5.KNNClassifier();
 let isTrained = false;
-
-let predictCallCount = 0;
-let results = [];
-
-// Clear the result objects
-const clearResults = (expectedCount) => {
-  predictCallCount = expectedCount;
-  results = [];
-};
+let predictions = [];
 
 // Perform an in-place shuffling of the data
 const shuffle = (data) => {
@@ -20,46 +12,77 @@ const shuffle = (data) => {
   }
 };
 
+const runBatch = (length, func, updateProgress, done) => {
+  const batchSize = Math.max(20, Math.floor(length / 100));
+  let start = 0;
+
+  const next = () => {
+    updateProgress(start / length);
+    setTimeout(start < length ? batch : done);
+  };    
+
+  const batch = () => {
+    let end = Math.min(start + batchSize, length);
+    func(start, end, next);
+    start = end;
+  };
+
+  next();
+};
+
 // Train the KNN with this data, format [[label, val1, val2, ...], ...]
-const train = (data) => {
-  for (let row of data) {
-    let label = row[0];
+const train = (data, updateProgress, done)  => {
+  const trainer = (start, end, next) => {
+    for (let i = start; i < end; i++) {
+      let label = data[i][0];
 
-    if (label != null) {
-      knn.addExample(row.slice(1), label);
+      if (label != null) {
+        knn.addExample(data[i].slice(1), label);
+      }
     }
-  }
 
-  console.log("KNN Trained");
+    next();
+  };
+
+  runBatch(data.length, trainer, (val) => updateProgress('Training', val), done);
 };
 
 /**
  * Make a prediction
  * @param {Number} k The K for K-Nearest-Neighbors
- * @param {Number[]} values The values to predict on
- * @param {String} expected The expected result if testing, or null otherwise
+ * @param {Number[][]} rows The list of value rows to predict on
+ * @param {String[]} expectedResults The expected results if testing, or null otherwise
+ * @param {Function} updateProgress Updater with (name, (0..1)), informs callers about partial progress
  * @param {Function} done Callback with (), called only by one predict function when all are complete
  */
-const predict = (k, values, expected, done) => {
-  knn.classify(values, k)
-     .then(result => {
-       results.push({
-         label: result.label,
-         confidences: result.confidencesByLabel,
-         expected: expected
-        });
+const predict = (k, rows, expectedResults, updateProgress, done) => {
+  const formatResult = (result, i) => {
+    return {
+      label: result.value.label,
+      confidences: result.value.confidencesByLabel,
+      expected: expectedResults ? expectedResults[i] : null
+    };
+  }
 
-       if (results.length === predictCallCount) {
-         done();
-       }
-     });
+  const predictor = (start, end, next) => {
+    let promises = rows.slice(start, end)
+                       .map(row => knn.classify(row, k));
+
+    Promise.allSettled(promises)
+           .then(results => {
+             predictions = predictions.concat(results.map(formatResult));
+             next();
+           });
+  };
+
+  runBatch(rows.length, predictor, (val) => updateProgress('Predicting', val), done);
 };
 
 const createTestSummary = (done) => {
   let summary = {};
   let correctCount = 0;
 
-  for (let result of results) {
+  for (let result of predictions) {
     console.log(`Predicted ${result.label}, actually ${result.expected}`);
 
     let { label, confidences, expected } = result;
@@ -95,57 +118,60 @@ const createTestSummary = (done) => {
 
   done([
     { 
-      title: `${(correctCount / results.length * 100).toFixed(2)}% Predicted Correctly`,
+      title: `${(correctCount / predictions.length * 100).toFixed(2)}% Predicted Correctly`,
       columns: ['Count', 'Predicted', 'Average Confidence'],
       rows: correctRows,
     },
     { 
-      title: `${((results.length - correctCount) / results.length * 100).toFixed(2)}% Predicted Incorrectly`,
+      title: `${((predictions.length - correctCount) / predictions.length * 100).toFixed(2)}% Predicted Incorrectly`,
       columns: ['Count', 'Actual', 'Predicted', 'Average Confidence'],
       rows: incorrectRows,
     }
   ]);
 };
 
-function test(data, k, percent, done) {
+const createRunSummary = (k, values, done) => {
+  let confidences = predictions[0].confidences;
+  let rows = Object.keys(confidences)
+                    .map(key => [confidences[key].toFixed(2), key])
+                    .filter(x => x[0] > 0);
+
+  done([{
+    title: `Predict for values [${values}] with K=${k}`,
+    columns: ['Confidence', 'Prediction'],
+    rows: rows,
+  }]);
+};
+
+function test(data, k, percent, updateProgress, done) {
   shuffle(data);
 
   let trainingLength = Math.floor(data.length * (percent / 100));
   let trainingData = data.slice(0, trainingLength);
-  let testingData = data.slice(trainingLength);
+  let otherData = data.slice(trainingLength);
+  let testingData = otherData.map(row => row.slice(1));
+  let expectedResults = otherData.map(row => row[0]);
+
+  isTrained = false;
+  predictions = [];
 
   // Always retrain in test mode
-  train(trainingData);
-  isTrained = false;
-
-  clearResults(testingData.length);
-
-  for (let row of testingData) {
-    predict(k, row.slice(1), row[0], () => createTestSummary(done));
-  }
+  train(trainingData, updateProgress, () => {
+    predict(k, testingData, expectedResults, updateProgress, () => createTestSummary(done));
+  });
 }
 
-function run(data, k, values, done) {
-  if (!isTrained) {
-    train(data);
+function run(data, k, values, updateProgress, done) {
+  predictions = [];
+
+  const maybeTrain = (done) => {
+    if (isTrained) return done();
+
     isTrained = true;
-  }
-  
-  clearResults(1);
+    train(data, updateProgress, done);
+  };
 
-  predict(k, values, null, () => {
-    let confidences = results[0].confidences;
-    let rows = Object.keys(confidences)
-                     .map(key => [key, confidences[key].toFixed(2)])
-                     .filter(x => x[1] > 0)
-                     .sort((a, b) => b[1] - a[1]);
-
-    done([{
-      title: `Predict for values [${values}] with K=${k}`,
-      columns: ['Predicted', 'Confidence'],
-      rows: rows,
-    }]);
-  });
+  maybeTrain(() => { predict(k, [values], null, updateProgress, () => createRunSummary(k, values, done)) });
 }
 
 function clear() {
