@@ -16,6 +16,15 @@ export default function SplitButton(props) {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
+  // If only one option was provided, just send a regular button
+  if (props.options.length === 1) {
+    return (
+      <Button variant="outlined" color="primary" onClick={() => props.onClick(props.options[selectedIndex])} size="large">
+        {props.options[selectedIndex]}
+      </Button>
+    );
+  }
+
   const menuClick = (event) => setMenuAnchor(event.currentTarget);
   const menuClose = () => setMenuAnchor(null);
 

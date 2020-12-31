@@ -36,7 +36,9 @@ export default function RunSelections(props) {
   const [predictValues, setPredictValues] = React.useState([]);
   const classes = useStyles();
 
-  const options = props.trainingDataLength ? ['Test', 'Predict'] : ['Predict'];
+  // Disabled: Predict Option
+  const options = ['Test'];
+  //const options = props.trainingDataLength ? ['Test', 'Predict'] : ['Predict'];
   const predictMessageStart = props.trainingDataLength ? 'Train on the full data set, then ' : 'Using the imported model, ';
 
   if (!options.includes(selectedOption)) {

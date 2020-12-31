@@ -84,11 +84,11 @@ export default function HeaderMenu(props) {
           ref={uploadModelRef}
         />
 
-        <label htmlFor="import-model-button">
+        {/*<label htmlFor="import-model-button">
           <MenuItem onClick={menuClose}>Import KNN Model</MenuItem>
         </label>
 
-        <MenuItem onClick={onExport}>Export KNN Model</MenuItem>
+        <MenuItem onClick={onExport}>Export KNN Model</MenuItem>*/}
       </Menu>
     </div>
   );
