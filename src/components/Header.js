@@ -1,11 +1,17 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Button, Toolbar, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import HeaderMenu from './HeaderMenu';
+import Utils from '../Utils';
 
 const useStyles = makeStyles((theme) => ({
   header: {
     zIndex: theme.zIndex.drawer + 1,
+  },
+  input: {
+    display: 'none',
+  },
+  title: {
+    flexGrow: 1,
   },
 }));
 
@@ -20,15 +26,29 @@ const useStyles = makeStyles((theme) => ({
  * @param {*} props React props
  */
 export default function Header(props) {
+  const uploadCSVRef = React.useRef(null);
   const classes = useStyles();
 
   return (
     <AppBar position="static" className={classes.header}>
       <Toolbar>
-        <HeaderMenu {...props} />
-        <Typography variant="h6" noWrap>
-          Simple KNNClassifier
+        <Typography variant="h6" noWrap className={classes.title}>
+          SimpleKNN
         </Typography>
+
+        <input
+          accept=".csv"
+          className={classes.input}
+          id="upload-csv-button2"
+          type="file"
+          onChange={() => Utils.uploadCSV(uploadCSVRef, text => props.setTrainingData(text))}
+          ref={uploadCSVRef}
+        />
+
+        <label htmlFor="upload-csv-button2">
+          <Button variant="outlined" color="inherit" component="span">Upload Data</Button>
+        </label>
+
       </Toolbar>
     </AppBar>
   );
