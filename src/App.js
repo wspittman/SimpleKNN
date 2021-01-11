@@ -98,17 +98,20 @@ class App extends React.Component {
     this.setState(stateObject);
   }
 
-  prepData() {
+  prepData(sendData) {
+    if (!this.state.selectedIndices.length) return this.setError('No input columns selected');
+    if (this.state.labelIndex == null) return this.setError('No result column selected');
+
     // Translate the bool[] to a shorter int[]
     const dataIndices = this.state.selectedIndices.map((val, i) => val ? i : null)
                                                   .filter(x => x != null);
 
     // Return the data in the format [[label, data1, ...], ...]
-    return this.state.trainingData.slice(1)
-                          // For each row, create an array with the label
-                          .map(row => [row[this.state.labelIndex]]
-                          // Then append all the data values, coerced back into numbers
-                          .concat(dataIndices.map(i => +row[i])));
+    sendData(this.state.trainingData.slice(1)
+                       // For each row, create an array with the label
+                       .map(row => [row[this.state.labelIndex]]
+                       // Then append all the data values, coerced back into numbers
+                       .concat(dataIndices.map(i => +row[i]))));
   }
 
   createDataSelectionArea() {
@@ -132,8 +135,8 @@ class App extends React.Component {
       return (
         <RunSelections 
           trainingDataLength={this.state.knnType === 'data' && this.state.trainingData.length}
-          test={(k, percent) => Classifier.test(this.prepData(), k, percent, this.setProgress, this.setResults)}
-          predict={(k, values) => Classifier.run(this.prepData(), k, values, this.setProgress, this.setResults)}
+          test={(k, percent) => this.prepData(data => Classifier.test(data, k, percent, this.setProgress, this.setResults))}
+          predict={(k, values) => this.prepData(data => Classifier.run(data, k, values, this.setProgress, this.setResults))}
         />
       );
     } else {
