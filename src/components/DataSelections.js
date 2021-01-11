@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core';
+import { Checkbox, Paper, Radio, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -56,33 +56,25 @@ export default function DataSelections(props) {
           <TableRow>
             <TableCell className={classes.firstColumn} />
             {columns.map((column, i) => (
-              
                 <TableCell key={`columnHeader${i}`}>{column}</TableCell>
-              
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
           <TableRow>
-            <Tooltip title="An example row from the data">
-              <TableCell component="th" scope="row">Example</TableCell>
-            </Tooltip>
+            <TableCell component="th" scope="row">Example</TableCell>
             {example.map((value, i) => (
               <TableCell key={`columnValue${i}`}>{value}</TableCell>
             ))}
           </TableRow>
 
           <TableRow>
-            <Tooltip title="Select any columns that should be used as training inputs. These must be numbers."> 
-              <TableCell component="th" scope="row">Training Data</TableCell>
-            </Tooltip>
+            <TableCell component="th" scope="row">Inputs</TableCell>
             {dataCheckboxes}
           </TableRow>
 
           <TableRow>
-            <Tooltip title="Select that column that is the 'result'. It should be a discrete set: colors, letter grades, buy/sell/hold, etc."> 
-              <TableCell component="th" scope="row">Result</TableCell>
-            </Tooltip>
+            <TableCell component="th" scope="row">Result</TableCell>
             {labelRadios}
           </TableRow>
             

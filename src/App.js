@@ -2,10 +2,10 @@ import React from 'react';
 import Header from './components/Header';
 import DataSelections from './components/DataSelections';
 import ErrorMessage from './components/ErrorMessage';
-import IntroMessage from './components/IntroMessage';
 import ProgressCircle from './components/ProgressCircle';
 import RunSelections from './components/RunSelections';
 import ResultTable from './components/ResultTable';
+import Markdown from './components/Markdown';
 import Classifier from './Classifier';
 
 class App extends React.Component {
@@ -33,6 +33,13 @@ class App extends React.Component {
     this.setModel = this.setModel.bind(this);
     this.setTrainingData = this.setTrainingData.bind(this);
     this.setResults = this.setResults.bind(this);
+  }
+
+  componentDidMount() {
+    const readmePath = require('./Help.md');
+    fetch(readmePath)
+      .then(response => response.text())
+      .then(text => { this.setState({helpMarkdown: text})});
   }
 
   setError(message) {
@@ -117,7 +124,7 @@ class App extends React.Component {
       );
     }
 
-    return <IntroMessage content={this.state.knnType === 'model' ? 'A model has been loaded' : null} />;
+    return <Markdown>{this.state.helpMarkdown}</Markdown>;
   }
 
   createRunSelectionArea() {
@@ -147,8 +154,7 @@ class App extends React.Component {
       <div className="App">
         <Header 
           setTrainingData={this.setTrainingData}
-          setModel={this.setModel}
-          saveModel={() => Classifier.save()}
+          helpMarkdown={this.state.helpMarkdown}
         />
 
         {this.createDataSelectionArea()}

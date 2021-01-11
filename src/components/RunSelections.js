@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputAdornment, TextField, Tooltip } from '@material-ui/core';
+import { InputAdornment, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SplitButton from './SplitButton';
 
@@ -95,17 +95,15 @@ export default function RunSelections(props) {
       <span>
         <SplitButton onClick={submit} onSelectionChange={setSelectedOption} options={options} />
 
-        <Tooltip title="The number of neighbors to examine when predicting. Larger numbers has less noise, but higher computation times and increased bias from outliers.">
-          <TextField
-            className={classes.inlineNumber}
-            variant="outlined"
-            type="number"
-            size="small"
-            defaultValue={k}
-            onChange={event => setK(event.target.value)}
-            InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
-          />
-        </Tooltip>
+        <TextField
+          className={classes.inlineNumber}
+          variant="outlined"
+          type="number"
+          size="small"
+          defaultValue={k}
+          onChange={event => setK(event.target.value)}
+          InputProps={{startAdornment: <InputAdornment position="start">K=</InputAdornment>}}
+        />
 
         {selectedOption === 'Test' ? testDescription() : predictDescription()}
       </span>

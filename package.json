@@ -10,6 +10,7 @@
     "@material-ui/icons": "^4.9.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-markdown": "^5.0.3",
     "react-papaparse": "^3.7.3",
     "react-scripts": "^3.4.3"
   },

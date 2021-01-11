@@ -1,6 +1,10 @@
 import React from 'react';
-import { AppBar, Button, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Dialog, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PostAddOutlinedIcon from '@material-ui/icons/PostAddOutlined';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+import GitHubIcon from '@material-ui/icons/GitHub';
+import Markdown from './Markdown';
 import Utils from '../Utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,14 +22,14 @@ const useStyles = makeStyles((theme) => ({
 /**
  * The header bar
  * 
- * Props (all passed through to HeaderMenu):
+ * Props:
  * setTrainingData: (data) => Handle the uploaded training data
- * setModel: (model) => Handle the uploaded KNN model
- * saveModel: () => Download the currently trained KNN model
+ * helpMarkdown: ...
  * 
  * @param {*} props React props
  */
 export default function Header(props) {
+  const [open, setOpen] = React.useState(false);
   const uploadCSVRef = React.useRef(null);
   const classes = useStyles();
 
@@ -39,15 +43,37 @@ export default function Header(props) {
         <input
           accept=".csv"
           className={classes.input}
-          id="upload-csv-button2"
+          id="upload-csv-button"
           type="file"
           onChange={() => Utils.uploadCSV(uploadCSVRef, text => props.setTrainingData(text))}
           ref={uploadCSVRef}
         />
 
-        <label htmlFor="upload-csv-button2">
-          <Button variant="outlined" color="inherit" component="span">Upload Data</Button>
+        <label htmlFor="upload-csv-button">
+          <Tooltip title="Upload CSV data set">
+            <IconButton color="inherit" aria-label="add" component="span">
+              <PostAddOutlinedIcon />
+            </IconButton>
+          </Tooltip>
         </label>
+
+        <Tooltip title="Help Dialog">
+          <IconButton color="inherit" aria-label="help" onClick={() => setOpen(true)}>
+            <HelpOutlineOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <Markdown>
+            {props.helpMarkdown}
+          </Markdown>
+        </Dialog>
+
+        <Tooltip title="GitHub Repository">
+          <IconButton color="inherit" aria-label="github" href="https://github.com/wspittman/SimpleKNN.git" target="_blank" rel="noopener noreferrer"> 
+            <GitHubIcon />
+          </IconButton>
+        </Tooltip>
 
       </Toolbar>
     </AppBar>
