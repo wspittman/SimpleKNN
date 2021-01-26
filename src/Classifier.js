@@ -80,54 +80,18 @@ const predict = (k, rows, expectedResults, updateProgress, done) => {
 
 const createTestSummary = (done) => {
   let summary = {};
-  let correctCount = 0;
 
   for (let result of predictions) {
-    console.log(`Predicted ${result.label}, actually ${result.expected}`);
-
     let { label, confidences, expected } = result;
 
-    if (label === expected) correctCount++;
-
     summary[expected] = summary[expected] || {};
-    summary[expected][label] = summary[expected][label] || { count: 0, confidenceSum: 0 };
+    summary[expected][label] = summary[expected][label] || { count: 0, confidences: [] };
 
     summary[expected][label].count++;
-    summary[expected][label].confidenceSum += confidences[label];
+    summary[expected][label].confidences.push(confidences[label]);
   }
 
-  let correctRows = [];
-  let incorrectRows = [];
-  
-  for (let expected of Object.keys(summary)) {
-    for (let label of Object.keys(summary[expected])) {
-      let row = [
-        summary[expected][label].count,
-        expected,
-        label,
-        (summary[expected][label].confidenceSum / summary[expected][label].count).toFixed(2),
-      ];
-
-      if (expected === label) {
-        correctRows.push(row.slice(0, 2).concat(row.slice(3)));
-      } else {
-        incorrectRows.push(row);
-      }
-    }
-  }
-
-  done([
-    { 
-      title: `${(correctCount / predictions.length * 100).toFixed(2)}% Predicted Correctly`,
-      columns: ['Count', 'Predicted', 'Average Confidence'],
-      rows: correctRows,
-    },
-    { 
-      title: `${((predictions.length - correctCount) / predictions.length * 100).toFixed(2)}% Predicted Incorrectly`,
-      columns: ['Count', 'Actual', 'Predicted', 'Average Confidence'],
-      rows: incorrectRows,
-    }
-  ]);
+  done(summary);
 };
 
 const createRunSummary = (k, values, done) => {

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { DataGrid } from '@material-ui/data-grid';
+import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   paddedLine: {
@@ -17,58 +17,37 @@ const useStyles = makeStyles((theme) => ({
  * @param {*} props React props
  */
 export default function ResultTable(props) {
-  const [orderBy, setOrderBy] = React.useState(0);
-  const [order, setOrder] = React.useState('desc');
   const classes = useStyles();
 
   if (!props.content) return (<div />)
 
-  let {title, columns, rows} = props.content;
+  let content = props.content;
 
-  let stableRows = rows.map((row, index) => [row, index]);
-  stableRows.sort((a, b) => {
-    let compare = order === 'asc' ? a[0][orderBy] - b[0][orderBy] : b[0][orderBy] - a[0][orderBy];
-    if (compare !== 0) return compare;
-    return a[1] - b[1];
-  });
-  let sortedRows = stableRows.map(el => el[0]);
+  let gridCols = [
+    { field: 'count', headerName: 'Count', width: 200 },
+    { field: 'isCorrect', headerName: 'Correct?', width: 200 },
+    { field: 'expected', headerName: 'Actual', width: 200 },
+    { field: 'predicted', headerName: 'Predicted', width: 200 },
+    { field: 'confidence', headerName: 'Average Confidence', description: 'tooltip', width: 200 },
+  ];
+
+  let gridRows = [];
+  for (let expected of Object.keys(content)) {
+    for (let predicted of Object.keys(content[expected])) {
+      let data = content[expected][predicted];
+
+      gridRows.push({
+        id: gridRows.length,
+        count: data.count,
+        isCorrect: expected === predicted,
+        expected: expected,
+        predicted: predicted,
+        confidence: (data.confidences.reduce((sum, val) => sum + val) / data.confidences.length).toFixed(2),
+      });
+    }
+  }
 
   return (
-    <TableContainer component={Paper}>
-      <Typography className={classes.paddedLine} variant="h6">{title}</Typography>
-      <Table size="small" aria-label="result table">
-        <TableHead>
-          <TableRow>
-            {columns.map((column, i) => (
-              <TableCell 
-                key={`columnHeader${i}`}
-                sortDirection={orderBy === i ? order : false}
-              >
-                <TableSortLabel
-                  active={orderBy === i}
-                  direction={orderBy === i ? order : 'asc'}
-                  onClick={() => {
-                    let isAsc = orderBy === i && order === 'asc';
-                    setOrder(isAsc ? 'desc' : 'asc');
-                    setOrderBy(i);
-                  }}
-                >
-                  {column}
-                </TableSortLabel>
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedRows.map((row, i) => (
-            <TableRow key={`resultRow${i}`}>
-              {row.map((value, j) => (
-                <TableCell key={`resultValue${i}-${j}`}>{value}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <DataGrid class={classes.paddedLine} autoHeight={true} rows={gridRows} columns={gridCols} />
   );
 }

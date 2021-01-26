@@ -1,12 +1,12 @@
 import React from 'react';
-import Header from './components/Header';
+import Classifier from './Classifier';
 import DataSelections from './components/DataSelections';
 import ErrorMessage from './components/ErrorMessage';
-import ProgressCircle from './components/ProgressCircle';
-import RunSelections from './components/RunSelections';
-import ResultTable from './components/ResultTable';
+import Header from './components/Header';
 import Markdown from './components/Markdown';
-import Classifier from './Classifier';
+import ProgressCircle from './components/ProgressCircle';
+import ResultTable from './components/ResultTable';
+import RunSelections from './components/RunSelections';
 
 class App extends React.Component {
   constructor(props) {
@@ -164,12 +164,7 @@ class App extends React.Component {
         {this.createRunSelectionArea()}
         {this.createProgressCircle()}
 
-        {this.state.results.map((result, i) => (
-          <ResultTable
-            key={`ResultTable${i}`}
-            content={result}
-          />
-        ))}
+        <ResultTable content={this.state.results} />
 
         <ErrorMessage 
           message={this.state.errorMessage}

@@ -1,11 +1,11 @@
-import React from 'react';
 import { AppBar, Dialog, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PostAddOutlinedIcon from '@material-ui/icons/PostAddOutlined';
-import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import GitHubIcon from '@material-ui/icons/GitHub';
-import Markdown from './Markdown';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+import PostAddOutlinedIcon from '@material-ui/icons/PostAddOutlined';
+import React from 'react';
 import Utils from '../Utils';
+import Markdown from './Markdown';
 
 const useStyles = makeStyles((theme) => ({
   header: {
