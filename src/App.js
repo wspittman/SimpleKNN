@@ -22,6 +22,7 @@ class App extends React.Component {
       selectedIndices: [],
 
       results: null,
+      isNumericResult: false,
 
       progressValue: 0,
       progressLabel: null,
@@ -136,8 +137,8 @@ class App extends React.Component {
       return (
         <RunSelections 
           trainingDataLength={this.state.knnType === 'data' && this.state.trainingData.length}
-          test={(k, percent) => this.prepData(data => Classifier.test(data, k, percent, this.setProgress, this.setResults))}
-          predict={(k, values) => this.prepData(data => Classifier.run(data, k, values, this.setProgress, this.setResults))}
+          test={(k, percent, isNumericResult) => this.setState({isNumericResult}, () => this.prepData(data => Classifier.test(data, k, percent, this.setProgress, this.setResults)))}
+          predict={(k, values, isNumericResult) => this.setState({isNumericResult}, () => this.prepData(data => Classifier.run(data, k, values, this.setProgress, this.setResults)))}
         />
       );
     } else {
@@ -157,8 +158,8 @@ class App extends React.Component {
     if (this.state.knnType) {
       return (
         <div>
-          <SummaryTable content={this.state.results} />
-          <ResultTable content={this.state.results} />
+          <SummaryTable content={this.state.results} isNumericResult={this.state.isNumericResult} />
+          <ResultTable content={this.state.results} isNumericResult={this.state.isNumericResult} />
         </div>
       );
     } else {

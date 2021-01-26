@@ -19,9 +19,10 @@ const useStyles = makeStyles((theme) => ({
 export default function SummaryTable(props) {
   const classes = useStyles();
   let content = props.content || {};
+  let isNumericResult = props.isNumericResult;
 
-  let summary = { count: 0, confSum: 0 };
-  let matchSummary = { count: 0, confSum: 0 };
+  let summary = { count: 0, confSum: 0, diffSum: 0 };
+  let matchSummary = { count: 0, confSum: 0, diffSum: 0 };
 
   for (let expected of Object.keys(content)) {
     for (let predicted of Object.keys(content[expected])) {
@@ -30,10 +31,18 @@ export default function SummaryTable(props) {
 
       summary.count += data.count;
       summary.confSum += confSum;
+      
+      if (isNumericResult) {
+        summary.diffSum += Math.abs(+expected - +predicted) * data.count
+      }
 
       if (expected === predicted) {
         matchSummary.count += data.count;
         matchSummary.confSum += confSum;
+
+        if (isNumericResult) {
+          matchSummary.diffSum += Math.abs(+expected - +predicted) * data.count
+        }
       }
     }
   }
@@ -44,7 +53,11 @@ export default function SummaryTable(props) {
     ['Count', summary.count, matchSummary.count, summary.count - matchSummary.count],
     ['% of Total', '100%', percent(matchSummary.count, summary.count), percent(summary.count - matchSummary.count, summary.count)],
     ['Avg Confidence', percent(summary.confSum, summary.count), percent(matchSummary.confSum, matchSummary.count), percent(summary.confSum - matchSummary.confSum, summary.count - matchSummary.count)]
-  ];  
+  ];
+
+  if (isNumericResult) {
+    rows.push(['Avg Difference', (summary.diffSum / summary.count).toFixed(2), (matchSummary.diffSum / matchSummary.count), ((summary.diffSum - matchSummary.diffSum) / (summary.count - matchSummary.count)).toFixed(2)]);
+  }
 
   return (
     <TableContainer component={Paper}>

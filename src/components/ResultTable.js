@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ResultTable(props) {
   const classes = useStyles();
   let content = props.content || {};
+  let isNumericResult = props.isNumericResult;
 
   let columns = [
     { field: 'count', headerName: 'Count', type: 'number', width: 125 },
@@ -27,6 +28,10 @@ export default function ResultTable(props) {
     { field: 'predicted', headerName: 'Predicted', width: 150 },
     { field: 'confidence', headerName: 'Confidence (avg)', type: 'number', width: 200, description: 'tooltip' },
   ];
+
+  if (isNumericResult) {
+    columns.splice(2, 0, { field: 'difference', headerName: 'Difference', width: 150 });
+  }
 
   let rows = [];
   for (let expected of Object.keys(content)) {
@@ -41,6 +46,7 @@ export default function ResultTable(props) {
         expected: expected,
         predicted: predicted,
         confidence: (confSum / data.confidences.length).toFixed(2),
+        difference: isNumericResult ? Math.abs(+expected - +predicted).toFixed(2) : 0
       });
     }
   }

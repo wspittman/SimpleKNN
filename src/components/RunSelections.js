@@ -1,6 +1,6 @@
-import React from 'react';
-import { InputAdornment, TextField } from '@material-ui/core';
+import { Checkbox, InputAdornment, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import React from 'react';
 import SplitButton from './SplitButton';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 export default function RunSelections(props) {
   const [selectedOption, setSelectedOption] = React.useState(null);
   const [k, setK] = React.useState(null);
+  const [isNumericResult, setIsNumericResult] = React.useState(null);
   const [testPercent, setTestPercent] = React.useState(70);
   const [predictValues, setPredictValues] = React.useState([]);
   const classes = useStyles();
@@ -66,7 +67,9 @@ export default function RunSelections(props) {
           onChange={event => setTestPercent(event.target.value)}
           InputProps={{endAdornment: <InputAdornment position="end">%</InputAdornment>}}
         />
-        of the data, then test prediction on the remainder
+        of the data, then test prediction on the remainder. (Treat the result as a numeric range:
+        <Checkbox checked={isNumericResult} onChange={event => setIsNumericResult(event.target.checked)} />
+        )
       </span>
     )
   };
@@ -88,7 +91,7 @@ export default function RunSelections(props) {
     )
   }
 
-  const submit = () => selectedOption === 'Test' ? props.test(k, testPercent) : props.predict(k, predictValues);
+  const submit = () => selectedOption === 'Test' ? props.test(k, testPercent, isNumericResult) : props.predict(k, predictValues, isNumericResult);
 
   return (
     <div className={classes.paddedLine}>
