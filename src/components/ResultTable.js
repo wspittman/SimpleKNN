@@ -32,6 +32,7 @@ export default function ResultTable(props) {
   for (let expected of Object.keys(content)) {
     for (let predicted of Object.keys(content[expected])) {
       let data = content[expected][predicted];
+      let confSum = data.confidences.reduce((sum, val) => sum + val);
 
       rows.push({
         id: rows.length,
@@ -39,7 +40,7 @@ export default function ResultTable(props) {
         isCorrect: expected === predicted,
         expected: expected,
         predicted: predicted,
-        confidence: (data.confidences.reduce((sum, val) => sum + val) / data.confidences.length).toFixed(2),
+        confidence: (confSum / data.confidences.length).toFixed(2),
       });
     }
   }

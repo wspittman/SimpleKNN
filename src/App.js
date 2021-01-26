@@ -7,6 +7,7 @@ import Markdown from './components/Markdown';
 import ProgressCircle from './components/ProgressCircle';
 import ResultTable from './components/ResultTable';
 import RunSelections from './components/RunSelections';
+import SummaryTable from './components/SummaryTable';
 
 class App extends React.Component {
   constructor(props) {
@@ -152,10 +153,13 @@ class App extends React.Component {
     }
   }
 
-  createResultTable() {
+  createResultArea() {
     if (this.state.knnType) {
       return (
-        <ResultTable content={this.state.results} />
+        <div>
+          <SummaryTable content={this.state.results} />
+          <ResultTable content={this.state.results} />
+        </div>
       );
     } else {
       return (<div />);
@@ -173,7 +177,7 @@ class App extends React.Component {
         {this.createDataSelectionArea()}
         {this.createRunSelectionArea()}
         {this.createProgressCircle()}
-        {this.createResultTable()}
+        {this.createResultArea()}
 
         <ErrorMessage 
           message={this.state.errorMessage}

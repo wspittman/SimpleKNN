@@ -1,6 +1,6 @@
-import React from 'react';
 import { Box, CircularProgress, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   paddedLine: {
@@ -22,6 +22,7 @@ export default function ProgressCircle(props) {
   const value = Math.floor(props.value * 100);
 
   return (
+    <Typography className={classes.paddedLine}>
     <Box className={classes.paddedLine} position="relative" display="inline-flex">
       <CircularProgress variant="determinate" value={props.value * 100} />
 
@@ -49,5 +50,6 @@ export default function ProgressCircle(props) {
         <Typography variant="caption" component="div" color="textSecondary">{props.label}</Typography>
       </Box>
     </Box>
+    </Typography>
   );
 }
