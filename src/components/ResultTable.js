@@ -9,35 +9,32 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /**
- * An table to display result data
+ * A data grid to display result data
  * 
  * Props:
- * content: {title, columns, rows}
+ * content: { EXPECTED_VAL: { PREDICTED_VAL: { count: N, confidences: [N1, ...]}, ...}, ...}
  * 
  * @param {*} props React props
  */
 export default function ResultTable(props) {
   const classes = useStyles();
+  let content = props.content || {};
 
-  if (!props.content) return (<div />)
-
-  let content = props.content;
-
-  let gridCols = [
-    { field: 'count', headerName: 'Count', width: 200 },
-    { field: 'isCorrect', headerName: 'Correct?', width: 200 },
-    { field: 'expected', headerName: 'Actual', width: 200 },
-    { field: 'predicted', headerName: 'Predicted', width: 200 },
-    { field: 'confidence', headerName: 'Average Confidence', description: 'tooltip', width: 200 },
+  let columns = [
+    { field: 'count', headerName: 'Count', type: 'number', width: 125 },
+    { field: 'isCorrect', headerName: 'Match', width: 125 },
+    { field: 'expected', headerName: 'Actual', width: 150 },
+    { field: 'predicted', headerName: 'Predicted', width: 150 },
+    { field: 'confidence', headerName: 'Confidence (avg)', type: 'number', width: 200, description: 'tooltip' },
   ];
 
-  let gridRows = [];
+  let rows = [];
   for (let expected of Object.keys(content)) {
     for (let predicted of Object.keys(content[expected])) {
       let data = content[expected][predicted];
 
-      gridRows.push({
-        id: gridRows.length,
+      rows.push({
+        id: rows.length,
         count: data.count,
         isCorrect: expected === predicted,
         expected: expected,
@@ -48,6 +45,15 @@ export default function ResultTable(props) {
   }
 
   return (
-    <DataGrid class={classes.paddedLine} autoHeight={true} rows={gridRows} columns={gridCols} />
+    <DataGrid 
+      class={classes.paddedLine}
+      autoHeight={true}
+      rows={rows}
+      columns={columns}
+      sortModel={[{
+        field: 'count',
+        sort: 'desc'
+      }]}
+    />
   );
 }

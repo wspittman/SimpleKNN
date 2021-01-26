@@ -20,7 +20,7 @@ class App extends React.Component {
       labelIndex: null,
       selectedIndices: [],
 
-      results: [],
+      results: null,
 
       progressValue: 0,
       progressLabel: null,
@@ -152,6 +152,16 @@ class App extends React.Component {
     }
   }
 
+  createResultTable() {
+    if (this.state.knnType) {
+      return (
+        <ResultTable content={this.state.results} />
+      );
+    } else {
+      return (<div />);
+    }
+  }
+
   render() {
     return (
       <div className="App">
@@ -163,8 +173,7 @@ class App extends React.Component {
         {this.createDataSelectionArea()}
         {this.createRunSelectionArea()}
         {this.createProgressCircle()}
-
-        <ResultTable content={this.state.results} />
+        {this.createResultTable()}
 
         <ErrorMessage 
           message={this.state.errorMessage}
