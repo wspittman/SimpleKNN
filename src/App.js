@@ -88,7 +88,7 @@ class App extends React.Component {
     }
 
     this.trainingDataUpdate({
-      trainingData: data,
+      trainingData: data.filter(x => Array.isArray(x) && x.length > 1),
       knnType: 'data',
       labelIndex: null,
       selectedIndices: []
