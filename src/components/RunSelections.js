@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 export default function RunSelections(props) {
   const [selectedOption, setSelectedOption] = React.useState(null);
   const [k, setK] = React.useState(null);
-  const [isNumericResult, setIsNumericResult] = React.useState(null);
+  const [isNumericResult, setIsNumericResult] = React.useState(false);
   const [testPercent, setTestPercent] = React.useState(70);
   const [predictValues, setPredictValues] = React.useState([]);
   const classes = useStyles();
