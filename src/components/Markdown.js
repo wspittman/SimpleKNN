@@ -1,7 +1,7 @@
-import React from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const useStyles = makeStyles((theme) => ({
   padding: {

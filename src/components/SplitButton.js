@@ -1,6 +1,6 @@
-import React from 'react';
-import { Menu, Button, ButtonGroup, MenuItem, MenuList } from '@material-ui/core'
+import { Button, ButtonGroup, Menu, MenuItem, MenuList } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import React from 'react';
 
 /**
  * A generic split button
@@ -16,11 +16,13 @@ export default function SplitButton(props) {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
+  let { options, onSelectionChange, onClick } = props;
+
   // If only one option was provided, just send a regular button
-  if (props.options.length === 1) {
+  if (options.length === 1) {
     return (
-      <Button variant="outlined" color="primary" onClick={() => props.onClick(props.options[selectedIndex])} size="large">
-        {props.options[selectedIndex]}
+      <Button variant="outlined" color="primary" onClick={() => onClick(options[selectedIndex])} size="large">
+        {options[selectedIndex]}
       </Button>
     );
   }
@@ -30,15 +32,15 @@ export default function SplitButton(props) {
 
   const update = (index) => {
     setSelectedIndex(index);
-    props.onSelectionChange(props.options[index]);
+    onSelectionChange(options[index]);
     menuClose();
-  }
+  };
 
   return (
     <span>
       <ButtonGroup variant="outlined" color="primary">
-        <Button onClick={() => props.onClick(props.options[selectedIndex])} size="large">
-          {props.options[selectedIndex]}
+        <Button onClick={() => onClick(options[selectedIndex])} size="large">
+          {options[selectedIndex]}
         </Button>
         <Button onClick={menuClick} size="small">
           <ArrowDropDownIcon />
@@ -47,7 +49,7 @@ export default function SplitButton(props) {
       
       <Menu anchorEl={menuAnchor} keepMounted open={Boolean(menuAnchor)} onClose={menuClose}>
           <MenuList id="split-button-menu">
-            {props.options.map((option, index) => (
+            {options.map((option, index) => (
               <MenuItem
                 key={option}
                 selected={index === selectedIndex}

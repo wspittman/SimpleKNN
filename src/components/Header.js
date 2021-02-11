@@ -23,8 +23,8 @@ const useStyles = makeStyles((theme) => ({
  * The header bar
  * 
  * Props:
+ * helpMarkdown: Markdown text for the help message
  * setTrainingData: (data) => Handle the uploaded training data
- * helpMarkdown: ...
  * 
  * @param {*} props React props
  */
@@ -32,6 +32,8 @@ export default function Header(props) {
   const [open, setOpen] = React.useState(false);
   const uploadCSVRef = React.useRef(null);
   const classes = useStyles();
+
+  let { helpMarkdown, setTrainingData } = props;
 
   return (
     <AppBar position="static" className={classes.header}>
@@ -45,7 +47,7 @@ export default function Header(props) {
           className={classes.input}
           id="upload-csv-button"
           type="file"
-          onChange={() => Utils.uploadCSV(uploadCSVRef, text => props.setTrainingData(text))}
+          onChange={() => Utils.uploadCSV(uploadCSVRef, text => setTrainingData(text))}
           ref={uploadCSVRef}
         />
 
@@ -65,7 +67,7 @@ export default function Header(props) {
 
         <Dialog open={open} onClose={() => setOpen(false)}>
           <Markdown>
-            {props.helpMarkdown}
+            {helpMarkdown}
           </Markdown>
         </Dialog>
 

@@ -19,12 +19,13 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function ProgressCircle(props) {
   const classes = useStyles();
-  const value = Math.floor(props.value * 100);
+
+  const { label, value } = props;
 
   return (
     <div className={classes.paddedLine}>
       <Box className={classes.paddedLine} position="relative" display="inline-flex">
-        <CircularProgress variant="determinate" value={props.value * 100} />
+        <CircularProgress variant="determinate" value={value * 100} />
 
         <Box
           top={0}
@@ -36,7 +37,7 @@ export default function ProgressCircle(props) {
           alignItems="center"
           justifyContent="center"
         >
-          <Typography variant="caption" component="div" color="textSecondary">{`${value}%`}</Typography>
+          <Typography variant="caption" component="div" color="textSecondary">{`${Math.floor(value * 100)}%`}</Typography>
         </Box>
 
         <Box
@@ -47,7 +48,7 @@ export default function ProgressCircle(props) {
           display="flex"
           justifyContent="center"
         >
-          <Typography variant="caption" component="div" color="textSecondary">{props.label}</Typography>
+          <Typography variant="caption" component="div" color="textSecondary">{label}</Typography>
         </Box>
       </Box>
     </div>

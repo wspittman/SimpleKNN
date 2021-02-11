@@ -1,6 +1,6 @@
-import React from 'react';
 import { IconButton, Snackbar } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import React from 'react';
 
 /**
  * An error message
@@ -13,15 +13,17 @@ import CloseIcon from '@material-ui/icons/Close';
  * @param {*} props React props
  */
 export default function ErrorMessage(props) {
+  let { isVisible, close, message } = props;
+
   return (
     <Snackbar
-      open={props.isVisible}
+      open={isVisible}
       autoHideDuration={6000}
-      onClose={props.close}
-      message={props.message}
+      onClose={close}
+      message={message}
       action={
         <React.Fragment>
-          <IconButton size="small" aria-label="close" color="inherit" onClick={props.close}>
+          <IconButton size="small" aria-label="close" color="inherit" onClick={close}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </React.Fragment>

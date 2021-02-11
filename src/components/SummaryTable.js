@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
  * 
  * Props:
  * content: { EXPECTED_VAL: { PREDICTED_VAL: { count: N, confidences: [N1, ...]}, ...}, ...}
+ * isNumericResult: True if the result value should be treated as a numeric range, false otherwise.
  * 
  * @param {*} props React props
  */
