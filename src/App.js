@@ -14,8 +14,6 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      knnType: null,
-
       trainingData: [],
 
       labelIndex: null,
@@ -32,7 +30,6 @@ class App extends React.Component {
     };
 
     this.setProgress = this.setProgress.bind(this);
-    this.setModel = this.setModel.bind(this);
     this.setTrainingData = this.setTrainingData.bind(this);
     this.setResults = this.setResults.bind(this);
   }
@@ -65,20 +62,6 @@ class App extends React.Component {
     });
   }
 
-  setModel(model) {
-    if (!model) {
-      this.setError('Could not parse model. Are you sure it is in JSON format?');
-      return;
-    }
-
-    Classifier.clear();
-
-    Classifier.load(model, error => {
-      if (error) this.setError('Could not parse model. Are you sure it was created by ML5 KNN?');
-      else this.setState({knnType: 'model'});
-    });
-  }
-
   setTrainingData(data) {
     if (!data ||
         !Array.isArray(data[0]) || 
@@ -89,7 +72,6 @@ class App extends React.Component {
 
     this.trainingDataUpdate({
       trainingData: data.filter(x => Array.isArray(x) && x.length > 1),
-      knnType: 'data',
       labelIndex: null,
       selectedIndices: []
     });
@@ -112,12 +94,13 @@ class App extends React.Component {
     sendData(this.state.trainingData.slice(1)
                        // For each row, create an array with the label
                        .map(row => [row[this.state.labelIndex]]
-                       // Then append all the data values, coerced back into numbers
-                       .concat(dataIndices.map(i => +row[i]))));
+                                   // Then append all the data values, coerced back into numbers
+                                   .concat(dataIndices.map(i => +row[i]))
+                           ));
   }
 
   createDataSelectionArea() {
-    if (this.state.knnType === 'data') {
+    if (this.state.trainingData.length) {
       return (
         <DataSelections 
           columns={this.state.trainingData[0]}
@@ -133,12 +116,11 @@ class App extends React.Component {
   }
 
   createRunSelectionArea() {
-    if (this.state.knnType) {
+    if (this.state.trainingData.length) {
       return (
         <RunSelections 
-          trainingDataLength={this.state.knnType === 'data' && this.state.trainingData.length}
+          trainingDataLength={this.state.trainingData.length}
           test={(k, percent, isNumericResult) => this.setState({isNumericResult}, () => this.prepData(data => Classifier.test(data, k, percent, this.setProgress, this.setResults)))}
-          predict={(k, values, isNumericResult) => this.setState({isNumericResult}, () => this.prepData(data => Classifier.run(data, k, values, this.setProgress, this.setResults)))}
         />
       );
     } else {
@@ -155,7 +137,7 @@ class App extends React.Component {
   }
 
   createResultArea() {
-    if (this.state.knnType) {
+    if (this.state.trainingData.length) {
       return (
         <div>
           <SummaryTable content={this.state.results} isNumericResult={this.state.isNumericResult} />

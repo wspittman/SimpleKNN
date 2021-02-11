@@ -1,5 +1,4 @@
 let knn = window.ml5.KNNClassifier();
-let isTrained = false;
 let predictions = [];
 
 // Perform an in-place shuffling of the data
@@ -12,6 +11,14 @@ const shuffle = (data) => {
   }
 };
 
+/**
+ * Run a function, presumably async, in batches.
+ * 
+ * @param {*} length The total length of the data
+ * @param {Function} func A function with (start, end, next) to run in batches
+ * @param {Function} updateProgress Updater with (0..1), informs callers about partial progress
+ * @param {Function} done Callback with ()
+ */
 const runBatch = (length, func, updateProgress, done) => {
   const batchSize = Math.max(20, Math.floor(length / 100));
   let start = 0;
@@ -30,7 +37,13 @@ const runBatch = (length, func, updateProgress, done) => {
   next();
 };
 
-// Train the KNN with this data, format [[label, val1, val2, ...], ...]
+/**
+ * Train the KNN Classifier
+ * 
+ * @param {Array} data The training data in the format [[label, data1, ...], ...]
+ * @param {Function} updateProgress Updater with (name, (0..1)), informs callers about partial progress
+ * @param {Function} done Callback with ()
+ */
 const train = (data, updateProgress, done)  => {
   const trainer = (start, end, next) => {
     for (let i = start; i < end; i++) {
@@ -48,7 +61,8 @@ const train = (data, updateProgress, done)  => {
 };
 
 /**
- * Make a prediction
+ * Make a prediction based on a previously trained classifier
+ * 
  * @param {Number} k The K for K-Nearest-Neighbors
  * @param {Number[][]} rows The list of value rows to predict on
  * @param {String[]} expectedResults The expected results if testing, or null otherwise
@@ -78,6 +92,11 @@ const predict = (k, rows, expectedResults, updateProgress, done) => {
   runBatch(rows.length, predictor, (val) => updateProgress('Predicting', val), done);
 };
 
+/**
+ * Create a test summary from the completed predictions.
+ * 
+ * @param {Function} done Callback with (Object), with the test results
+ */
 const createTestSummary = (done) => {
   let summary = {};
 
@@ -94,19 +113,15 @@ const createTestSummary = (done) => {
   done(summary);
 };
 
-const createRunSummary = (k, values, done) => {
-  let confidences = predictions[0].confidences;
-  let rows = Object.keys(confidences)
-                    .map(key => [confidences[key].toFixed(2), key])
-                    .filter(x => x[0] > 0);
-
-  done([{
-    title: `Predict for values [${values}] with K=${k}`,
-    columns: ['Confidence', 'Prediction'],
-    rows: rows,
-  }]);
-};
-
+/**
+ * Run a test by training on some portion of the data and validating on the remainder.
+ * 
+ * @param {Array} data The training data in the format [[label, data1, ...], ...]
+ * @param {Number} k The K value for K-Nearest Neighbors
+ * @param {Number} percent The percentage (int) of the data to use for training (vs. validation)
+ * @param {Function} updateProgress Updater with (name, (0..1)), informs callers about partial progress
+ * @param {Function} done Callback with (Object), with the test results
+ */
 function test(data, k, percent, updateProgress, done) {
   shuffle(data);
 
@@ -116,7 +131,6 @@ function test(data, k, percent, updateProgress, done) {
   let testingData = otherData.map(row => row.slice(1));
   let expectedResults = otherData.map(row => row[0]);
 
-  isTrained = false;
   predictions = [];
 
   // Always retrain in test mode
@@ -125,38 +139,14 @@ function test(data, k, percent, updateProgress, done) {
   });
 }
 
-function run(data, k, values, updateProgress, done) {
-  predictions = [];
-
-  const maybeTrain = (done) => {
-    if (isTrained) return done();
-
-    isTrained = true;
-    train(data, updateProgress, done);
-  };
-
-  maybeTrain(() => { predict(k, [values], null, updateProgress, () => createRunSummary(k, values, done)) });
-}
-
+/**
+ * Reset the state of the underlying KNN object
+ */
 function clear() {
   knn = window.ml5.KNNClassifier();
-  isTrained = false;
-}
-
-function save() {
-  knn.save();
-}
-
-function load(jsonModel, done) {
-  knn.load(jsonModel)
-     .then(done)
-     .catch(done);
 }
 
 export default {
   test: test,
-  run: run,
   clear: clear,
-  save: save,
-  load: load,
 };
